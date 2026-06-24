@@ -5,13 +5,7 @@ import TopNav from '@/components/dashboard/TopNav'
 import ExecutiveMetrics from '@/components/dashboard/ExecutiveMetrics'
 import AIInsights from '@/components/dashboard/AIInsights'
 import AnalyticsCharts from '@/components/dashboard/AnalyticsCharts'
-import dynamic from 'next/dynamic'
-
-// Dynamically import HeatMap to avoid SSR issues with Leaflet
-const HeatMap = dynamic(
-  () => import('@/components/HeatMap'),
-  { ssr: false }
-)
+import HeatMap from '@/components/HeatMap'
 
 export default function Dashboard() {
   return (

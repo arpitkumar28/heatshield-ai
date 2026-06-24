@@ -5,7 +5,7 @@ import { Layers, Clock, MapPin } from 'lucide-react'
 import { analyticsAPI } from '@/lib/api'
 import dynamic from 'next/dynamic'
 
-// Dynamically import only the LeafletMap component to avoid SSR issues
+// Dynamically import LeafletMap to avoid SSR issues with leaflet
 const LeafletMap = dynamic(
   () => import('@/components/maps/LeafletMap'),
   { ssr: false }

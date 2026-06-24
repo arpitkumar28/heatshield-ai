@@ -1,7 +1,7 @@
 'use client'
 
-import { MapContainer, TileLayer, CircleMarker, Popup, LayersControl } from 'react-leaflet'
-import L from 'leaflet'
+import { useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 
 interface HeatDataPoint {
   id: number
@@ -23,62 +23,26 @@ interface LeafletMapProps {
   fullScreen?: boolean
 }
 
-// Fix for default marker icons - run once on module load
-if (typeof window !== 'undefined') {
-  delete (L.Icon.Default.prototype as any)._getIconUrl
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  })
-}
+// Dynamically import the actual map component to avoid SSR issues
+const LeafletMapClient = dynamic(
+  () => import('./LeafletMapClient'),
+  { ssr: false }
+)
 
-export default function LeafletMap({
-  center,
-  heatData,
-  selectedLayer,
-  getColor,
-  getRadius,
-  fullScreen = false
-}: LeafletMapProps) {
-  return (
-    <MapContainer
-      center={center}
-      zoom={12}
-      style={{ height: '100%', width: '100%' }}
-    >
-      <LayersControl position="topright">
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        />
-        
-        {heatData.map((point) => (
-          <CircleMarker
-            key={point.id}
-            center={[point.lat, point.lng]}
-            radius={getRadius(point[selectedLayer])}
-            fillColor={getColor(point[selectedLayer], selectedLayer)}
-            color={point.isHotspot ? '#FF6B35' : '#00D4FF'}
-            weight={point.isHotspot ? 3 : 1}
-            opacity={0.7}
-            fillOpacity={0.5}
-          >
-            <Popup>
-              <div className="text-black">
-                <h3 className="font-bold mb-2">Location Details</h3>
-                <p>LST: {point.lst.toFixed(1)}°C</p>
-                <p>NDVI: {point.ndvi.toFixed(3)}</p>
-                <p>Heat Index: {point.heatIndex.toFixed(1)}°C</p>
-                <p>Time: {new Date(point.timestamp).toLocaleTimeString()}</p>
-                {point.isHotspot && (
-                  <p className="text-red-600 font-bold mt-2">⚠️ Heat Hotspot</p>
-                )}
-              </div>
-            </Popup>
-          </CircleMarker>
-        ))}
-      </LayersControl>
-    </MapContainer>
-  )
+export default function LeafletMap(props: LeafletMapProps) {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return (
+      <div className="flex items-center justify-center h-full bg-white/5 rounded-lg">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  return <LeafletMapClient {...props} />
 }
