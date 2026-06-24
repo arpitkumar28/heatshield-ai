@@ -1,7 +1,6 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, ForeignKey, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from geoalchemy2 import Geometry
 from app.core.database import Base
 
 
@@ -12,11 +11,10 @@ class Location(Base):
     name = Column(String, nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-    geometry = Column(Geometry('POINT', srid=4326))
     location_type = Column(String)  # city, district, region
     population = Column(Integer)
     area_sqkm = Column(Float)
-    metadata = Column(JSON)
+    extra_data = Column(JSON)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
@@ -55,7 +53,7 @@ class HeatData(Base):
     predicted_lst = Column(Float)
     prediction_confidence = Column(Float)
     
-    metadata = Column(JSON)
+    extra_data = Column(JSON)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     location = relationship("Location", back_populates="heat_data")
@@ -68,7 +66,6 @@ class CoolingCenter(Base):
     name = Column(String, nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-    geometry = Column(Geometry('POINT', srid=4326))
     address = Column(String)
     capacity = Column(Integer)
     current_occupancy = Column(Integer)

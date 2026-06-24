@@ -13,8 +13,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
+    # Environment
+    ENVIRONMENT: str = "development"
+    
     # Database
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/heatshield"
+    DATABASE_URL: str = "sqlite:///./heatshield.db"
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"

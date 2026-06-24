@@ -1,0 +1,44 @@
+{{- if .Values.redis.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "heatshield.fullname" . }}-redis
+  labels:
+    {{- include "heatshield.labels" . | nindent 4 }}
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "heatshield.selectorLabels" . | nindent 6 }}
+      app: redis
+  template:
+    metadata:
+      labels:
+        {{- include "heatshield.selectorLabels" . | nindent 8 }}
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
+        ports:
+        - containerPort: 6379
+        resources:
+          {{- toYaml .Values.redis.resources | nindent 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "heatshield.fullname" . }}-redis-service
+  labels:
+    {{- include "heatshield.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "heatshield.selectorLabels" . | nindent 4 }}
+    app: redis
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379
+  type: ClusterIP
+{{- end }}

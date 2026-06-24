@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "heatshield.fullname" . }}-ai-services
+  labels:
+    {{- include "heatshield.labels" . | nindent 4 }}
+    app: ai-services
+spec:
+  replicas: {{ .Values.replicaCount.aiServices }}
+  selector:
+    matchLabels:
+      {{- include "heatshield.selectorLabels" . | nindent 6 }}
+      app: ai-services
+  template:
+    metadata:
+      labels:
+        {{- include "heatshield.selectorLabels" . | nindent 8 }}
+        app: ai-services
+    spec:
+      containers:
+      - name: ai-services
+        image: "{{ .Values.image.aiServices.repository }}:{{ .Values.image.aiServices.tag }}"
+        imagePullPolicy: {{ .Values.image.aiServices.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.aiServicesPort }}
+        env:
+        - name: MODEL_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "heatshield.fullname" . }}-config
+              key: model-path
+        - name: BATCH_SIZE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "heatshield.fullname" . }}-config
+              key: batch-size
+        resources:
+          {{- toYaml .Values.resources.aiServices | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.service.aiServicesPort }}
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.service.aiServicesPort }}
+          initialDelaySeconds: 30
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "heatshield.fullname" . }}-ai-services-service
+  labels:
+    {{- include "heatshield.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "heatshield.selectorLabels" . | nindent 4 }}
+    app: ai-services
+  ports:
+  - protocol: TCP
+    port: {{ .Values.service.aiServicesPort }}
+    targetPort: {{ .Values.service.aiServicesPort }}
+  type: {{ .Values.service.type }}

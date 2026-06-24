@@ -1,0 +1,122 @@
+# Default values for heatshield
+replicaCount:
+  backend: 3
+  frontend: 2
+  aiServices: 2
+
+image:
+  backend:
+    repository: heatshield-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  frontend:
+    repository: heatshield-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  aiServices:
+    repository: heatshield-ai-services
+    tag: latest
+    pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  backendPort: 8000
+  frontendPort: 3000
+  aiServicesPort: 8001
+
+resources:
+  backend:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  frontend:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  aiServices:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "2000m"
+
+autoscaling:
+  enabled: true
+  backend:
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  frontend:
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+  aiServices:
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: heatshield.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api
+          pathType: Prefix
+          service: backend
+  tls:
+    - secretName: heatshield-tls
+      hosts:
+        - heatshield.example.com
+
+postgresql:
+  enabled: true
+  image:
+    repository: postgis/postgis
+    tag: 15-3.3
+  persistence:
+    enabled: true
+    size: 10Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: 7-alpine
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+config:
+  redisUrl: "redis://redis-service:6379/0"
+  apiUrl: "http://heatshield-backend-service:8000"
+  modelPath: "./models"
+  batchSize: "32"
+
+secrets:
+  databaseUrl: "postgresql://postgres:CHANGE_ME@postgres-service:5432/heatshield"
+  secretKey: "CHANGE_ME_GENERATE_WITH_OPENSSL_RAND_HEX_32"
+  bhuvanApiKey: "CHANGE_ME"

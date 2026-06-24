@@ -1,0 +1,75 @@
+{{- if .Values.postgresql.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "heatshield.fullname" . }}-postgres
+  labels:
+    {{- include "heatshield.labels" . | nindent 4 }}
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "heatshield.selectorLabels" . | nindent 6 }}
+      app: postgres
+  template:
+    metadata:
+      labels:
+        {{- include "heatshield.selectorLabels" . | nindent 8 }}
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: heatshield
+        - name: POSTGRES_PASSWORD
+          value: "CHANGE_ME"
+        resources:
+          {{- toYaml .Values.postgresql.resources | nindent 10 }}
+        {{- if .Values.postgresql.persistence.enabled }}
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        {{- end }}
+      {{- if .Values.postgresql.persistence.enabled }}
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: {{ include "heatshield.fullname" . }}-postgres-pvc
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "heatshield.fullname" . }}-postgres-service
+  labels:
+    {{- include "heatshield.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "heatshield.selectorLabels" . | nindent 4 }}
+    app: postgres
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+  type: ClusterIP
+---
+{{- if .Values.postgresql.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "heatshield.fullname" . }}-postgres-pvc
+  labels:
+    {{- include "heatshield.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.postgresql.persistence.size }}
+{{- end }}
+{{- end }}

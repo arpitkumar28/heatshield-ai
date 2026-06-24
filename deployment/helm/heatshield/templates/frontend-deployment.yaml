@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "heatshield.fullname" . }}-frontend
+  labels:
+    {{- include "heatshield.labels" . | nindent 4 }}
+    app: frontend
+spec:
+  replicas: {{ .Values.replicaCount.frontend }}
+  selector:
+    matchLabels:
+      {{- include "heatshield.selectorLabels" . | nindent 6 }}
+      app: frontend
+  template:
+    metadata:
+      labels:
+        {{- include "heatshield.selectorLabels" . | nindent 8 }}
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: "{{ .Values.image.frontend.repository }}:{{ .Values.image.frontend.tag }}"
+        imagePullPolicy: {{ .Values.image.frontend.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.frontendPort }}
+        env:
+        - name: NEXT_PUBLIC_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "heatshield.fullname" . }}-config
+              key: api-url
+        resources:
+          {{- toYaml .Values.resources.frontend | nindent 10 }}
+        livenessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.frontendPort }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.frontendPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "heatshield.fullname" . }}-frontend-service
+  labels:
+    {{- include "heatshield.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "heatshield.selectorLabels" . | nindent 4 }}
+    app: frontend
+  ports:
+  - protocol: TCP
+    port: {{ .Values.service.frontendPort }}
+    targetPort: {{ .Values.service.frontendPort }}
+  type: {{ .Values.service.type }}

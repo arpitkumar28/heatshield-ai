@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.core.database import get_db
-from app.core.security import create_access_token
+from app.core.security import create_access_token, get_current_user
 from app.core.config import settings
 from app.schemas.user import User, UserCreate, Token
 from app.services.auth_service import AuthService
@@ -53,5 +53,5 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
 
 @router.get("/me", response_model=User)
-def read_users_me(current_user: dict = Depends(get_current_user)):
+def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user

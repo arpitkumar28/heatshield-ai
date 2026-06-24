@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: heatshield-config
+data:
+  redis-url: "redis://redis-service:6379/0"
+  api-url: "http://heatshield-backend-service:8000"
+  model-path: "./models"
+  batch-size: "32"

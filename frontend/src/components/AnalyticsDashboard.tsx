@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle } from 'lucide-react'
+import { analyticsAPI } from '@/lib/api'
 
 const heatTrendData = [
   { month: 'Jan', lst: 25, heatIndex: 28, ndvi: 0.6 },
@@ -30,6 +31,23 @@ const interventionData = [
 
 export default function AnalyticsDashboard() {
   const [timeRange, setTimeRange] = useState('6m')
+  const [summary, setSummary] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchAnalyticsSummary()
+  }, [])
+
+  const fetchAnalyticsSummary = async () => {
+    try {
+      const response = await analyticsAPI.getSummary()
+      setSummary(response.data)
+    } catch (error) {
+      console.error('Error fetching analytics summary:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -51,30 +69,30 @@ export default function AnalyticsDashboard() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <KPICard
-          title="Total Hotspots Detected"
-          value="156"
-          change="+12%"
+          title="Average Temperature"
+          value={loading ? "Loading..." : `${summary?.average_temperature || 0}°C`}
+          change=""
           icon={<AlertTriangle className="w-5 h-5 text-red-500" />}
           trend="up"
         />
         <KPICard
-          title="Avg Temperature Reduction"
-          value="1.8°C"
-          change="+0.3°C"
+          title="Heat Index"
+          value={loading ? "Loading..." : `${summary?.heat_index || 0}°C`}
+          change=""
           icon={<TrendingDown className="w-5 h-5 text-green-500" />}
           trend="down"
         />
         <KPICard
-          title="Interventions Implemented"
-          value="23"
-          change="+5"
+          title="NDVI Score"
+          value={loading ? "Loading..." : summary?.ndvi_score?.toFixed(4) || "0.0000"}
+          change=""
           icon={<CheckCircle className="w-5 h-5 text-isro-accent" />}
           trend="up"
         />
         <KPICard
-          title="Population Protected"
-          value="2.4M"
-          change="+0.5M"
+          title="Hotspot Count"
+          value={loading ? "Loading..." : summary?.hotspot_count || 0}
+          change=""
           icon={<TrendingUp className="w-5 h-5 text-isro-orange" />}
           trend="up"
         />

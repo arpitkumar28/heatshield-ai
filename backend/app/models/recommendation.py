@@ -30,7 +30,7 @@ class Recommendation(Base):
     status = Column(String, default="proposed")  # proposed, approved, implemented, completed
     implementation_date = Column(DateTime(timezone=True))
     
-    metadata = Column(JSON)
+    extra_data = Column(JSON)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -66,5 +66,5 @@ class HeatAlert(Base):
     recommended_actions = Column(JSON)
     is_active = Column(Boolean, default=True)
     
-    metadata = Column(JSON)
+    extra_data = Column(JSON)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

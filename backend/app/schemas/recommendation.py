@@ -13,6 +13,7 @@ class RecommendationBase(BaseModel):
     cost_estimate: Optional[float] = None
     implementation_time: Optional[str] = None
     benefit_cost_ratio: Optional[float] = None
+    extra_data: Optional[dict] = None
 
 
 class RecommendationCreate(RecommendationBase):
@@ -47,6 +48,7 @@ class HeatAlertBase(BaseModel):
     affected_population: Optional[int] = None
     area_description: Optional[str] = None
     recommended_actions: Optional[dict] = None
+    extra_data: Optional[dict] = None
 
 
 class HeatAlertCreate(HeatAlertBase):

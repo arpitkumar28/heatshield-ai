@@ -10,7 +10,7 @@ class LocationBase(BaseModel):
     location_type: str
     population: Optional[int] = None
     area_sqkm: Optional[float] = None
-    metadata: Optional[dict] = None
+    extra_data: Optional[dict] = None
 
 
 class LocationCreate(LocationBase):
@@ -21,7 +21,7 @@ class LocationUpdate(BaseModel):
     name: Optional[str] = None
     population: Optional[int] = None
     area_sqkm: Optional[float] = None
-    metadata: Optional[dict] = None
+    extra_data: Optional[dict] = None
 
 
 class Location(LocationBase):

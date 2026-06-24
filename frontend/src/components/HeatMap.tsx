@@ -1,18 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, CircleMarker, Popup, LayersControl } from 'react-leaflet'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-import { Thermometer, Droplets, Leaf, Activity } from 'lucide-react'
+import { useEffect, useState, useCallback } from 'react'
+import { Layers, Clock, MapPin } from 'lucide-react'
+import { analyticsAPI } from '@/lib/api'
+import dynamic from 'next/dynamic'
 
-// Fix for default marker icons
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-})
+// Dynamically import only the LeafletMap component to avoid SSR issues
+const LeafletMap = dynamic(
+  () => import('@/components/maps/LeafletMap'),
+  { ssr: false }
+)
 
 interface HeatDataPoint {
   id: number
@@ -22,27 +19,65 @@ interface HeatDataPoint {
   ndvi: number
   heatIndex: number
   isHotspot: boolean
+  timestamp: string
 }
 
-export default function HeatMap() {
+export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }) {
   const [heatData, setHeatData] = useState<HeatDataPoint[]>([])
   const [selectedLayer, setSelectedLayer] = useState<'lst' | 'ndvi' | 'heatIndex'>('lst')
   const [loading, setLoading] = useState(true)
+  const [selectedCity, setSelectedCity] = useState('Jaipur')
+  const [heatmapData, setHeatmapData] = useState<any>(null)
+  const [isMounted, setIsMounted] = useState(false)
+  const [selectedTime, setSelectedTime] = useState('current')
+  const [showLayerPanel, setShowLayerPanel] = useState(false)
 
   useEffect(() => {
-    // Simulate fetching heat data
-    const mockData: HeatDataPoint[] = Array.from({ length: 50 }, (_, i) => ({
-      id: i,
-      lat: 28.6 + Math.random() * 0.1,
-      lng: 77.2 + Math.random() * 0.1,
-      lst: 30 + Math.random() * 15,
-      ndvi: Math.random() * 0.8,
-      heatIndex: 35 + Math.random() * 20,
-      isHotspot: Math.random() > 0.7
-    }))
-    setHeatData(mockData)
-    setLoading(false)
+    setIsMounted(true)
   }, [])
+
+  const fetchHeatmapData = useCallback(async () => {
+    try {
+      setLoading(true)
+      const response = await analyticsAPI.getHeatmap(selectedCity)
+      setHeatmapData(response.data)
+
+      // Transform hotspots into heat data points
+      const transformedData: HeatDataPoint[] = response.data.hotspots.map((hotspot: any, index: number) => ({
+        id: index,
+        lat: hotspot.lat,
+        lng: hotspot.lng,
+        lst: hotspot.temperature,
+        ndvi: 0.3 + Math.random() * 0.4,
+        heatIndex: hotspot.temperature + 2 + Math.random() * 3,
+        isHotspot: hotspot.risk_level === 'High',
+        timestamp: new Date().toISOString()
+      }))
+
+      setHeatData(transformedData)
+    } catch (error) {
+      console.error('Error fetching heatmap data:', error)
+      const mockData: HeatDataPoint[] = Array.from({ length: 50 }, (_, i) => ({
+        id: i,
+        lat: 26.9 + Math.random() * 0.1,
+        lng: 75.7 + Math.random() * 0.1,
+        lst: 30 + Math.random() * 15,
+        ndvi: Math.random() * 0.8,
+        heatIndex: 35 + Math.random() * 20,
+        isHotspot: Math.random() > 0.7,
+        timestamp: new Date().toISOString()
+      }))
+      setHeatData(mockData)
+    } finally {
+      setLoading(false)
+    }
+  }, [selectedCity, selectedTime])
+
+  useEffect(() => {
+    if (isMounted) {
+      fetchHeatmapData()
+    }
+  }, [isMounted, fetchHeatmapData])
 
   const getColor = (value: number, layer: string) => {
     if (layer === 'lst') {
@@ -63,143 +98,140 @@ export default function HeatMap() {
     }
   }
 
+  const getCityCenter = (city: string): [number, number] => {
+    const cityCenters: { [key: string]: [number, number] } = {
+      'Jaipur': [26.9124, 75.7873],
+      'Delhi': [28.6139, 77.2090],
+      'Ahmedabad': [23.0225, 72.5714],
+      'Hyderabad': [17.3850, 78.4867],
+      'Mumbai': [19.0760, 72.8777],
+      'Chennai': [13.0827, 80.2707],
+      'Kolkata': [22.5726, 88.3639],
+      'Bangalore': [12.9716, 77.5946]
+    }
+    return cityCenters[city] || cityCenters['Jaipur']
+  }
+
   const getRadius = (value: number) => {
     return 500 + (value * 20)
   }
 
   if (loading) {
     return (
-      <div className="glass rounded-xl p-8 flex items-center justify-center h-[600px]">
+      <div className="glass-card rounded-xl p-8 flex items-center justify-center h-[600px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-isro-orange mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading heat map data...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-text-muted">Loading heat map data...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={<Thermometer className="w-6 h-6" />}
-          title="Avg LST"
-          value="38.5°C"
-          change="+2.3°C"
-          color="isro-orange"
-        />
-        <StatCard
-          icon={<Activity className="w-6 h-6" />}
-          title="Heat Index"
-          value="42.1°C"
-          change="+1.8°C"
-          color="red"
-        />
-        <StatCard
-          icon={<Leaf className="w-6 h-6" />}
-          title="Avg NDVI"
-          value="0.45"
-          change="-0.05"
-          color="green"
-        />
-        <StatCard
-          icon={<Droplets className="w-6 h-6" />}
-          title="Hotspots"
-          value="12"
-          change="+3"
-          color="isro-accent"
-        />
+    <div className="space-y-4">
+      {/* Enhanced Map Controls */}
+      <div className="glass-card rounded-xl p-4 border border-white/10">
+        <div className="flex flex-wrap items-center gap-4">
+          {/* City Selector */}
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-primary" />
+            <select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-primary"
+            >
+              <option value="Jaipur">Jaipur</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Ahmedabad">Ahmedabad</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="Chennai">Chennai</option>
+              <option value="Kolkata">Kolkata</option>
+              <option value="Bangalore">Bangalore</option>
+            </select>
+          </div>
+
+          {/* Time Slider */}
+          <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+            <Clock className="w-4 h-4 text-primary" />
+            <select
+              value={selectedTime}
+              onChange={(e) => setSelectedTime(e.target.value)}
+              className="bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-primary"
+            >
+              <option value="current">Current</option>
+              <option value="-1h">1 Hour Ago</option>
+              <option value="-3h">3 Hours Ago</option>
+              <option value="-6h">6 Hours Ago</option>
+              <option value="-12h">12 Hours Ago</option>
+              <option value="-24h">24 Hours Ago</option>
+              <option value="-72h">72 Hours Ago</option>
+            </select>
+          </div>
+
+          {/* Layer Controls */}
+          <div className="flex items-center gap-2">
+            <Layers className="w-4 h-4 text-primary" />
+            <button
+              onClick={() => setSelectedLayer('lst')}
+              className={`px-4 py-2 rounded-lg text-sm transition-all ${
+                selectedLayer === 'lst'
+                  ? 'bg-primary text-white'
+                  : 'bg-white/10 hover:bg-white/20 text-text-muted'
+              }`}
+            >
+              Temperature
+            </button>
+            <button
+              onClick={() => setSelectedLayer('ndvi')}
+              className={`px-4 py-2 rounded-lg text-sm transition-all ${
+                selectedLayer === 'ndvi'
+                  ? 'bg-primary text-white'
+                  : 'bg-white/10 hover:bg-white/20 text-text-muted'
+              }`}
+            >
+              Vegetation
+            </button>
+            <button
+              onClick={() => setSelectedLayer('heatIndex')}
+              className={`px-4 py-2 rounded-lg text-sm transition-all ${
+                selectedLayer === 'heatIndex'
+                  ? 'bg-primary text-white'
+                  : 'bg-white/10 hover:bg-white/20 text-text-muted'
+              }`}
+            >
+              Heat Index
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Map Controls */}
-      <div className="glass rounded-xl p-4">
-        <div className="flex flex-wrap gap-2 mb-4">
-          <button
-            onClick={() => setSelectedLayer('lst')}
-            className={`px-4 py-2 rounded-lg transition-all ${
-              selectedLayer === 'lst'
-                ? 'bg-isro-orange text-white'
-                : 'bg-white/10 hover:bg-white/20'
-            }`}
-          >
-            Land Surface Temperature
-          </button>
-          <button
-            onClick={() => setSelectedLayer('ndvi')}
-            className={`px-4 py-2 rounded-lg transition-all ${
-              selectedLayer === 'ndvi'
-                ? 'bg-isro-orange text-white'
-                : 'bg-white/10 hover:bg-white/20'
-            }`}
-          >
-            NDVI (Vegetation)
-          </button>
-          <button
-            onClick={() => setSelectedLayer('heatIndex')}
-            className={`px-4 py-2 rounded-lg transition-all ${
-              selectedLayer === 'heatIndex'
-                ? 'bg-isro-orange text-white'
-                : 'bg-white/10 hover:bg-white/20'
-            }`}
-          >
-            Heat Index
-          </button>
-        </div>
-
-        {/* Map */}
-        <div className="h-[500px] rounded-lg overflow-hidden border border-isro-blue/30">
-          <MapContainer
-            center={[28.6139, 77.2090]}
-            zoom={12}
-            style={{ height: '100%', width: '100%' }}
-          >
-            <LayersControl position="topright">
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-              />
-              
-              {heatData.map((point) => (
-                <CircleMarker
-                  key={point.id}
-                  center={[point.lat, point.lng]}
-                  radius={getRadius(point[selectedLayer])}
-                  fillColor={getColor(point[selectedLayer], selectedLayer)}
-                  color={point.isHotspot ? '#FF6B35' : '#0066CC'}
-                  weight={point.isHotspot ? 3 : 1}
-                  opacity={0.7}
-                  fillOpacity={0.5}
-                >
-                  <Popup>
-                    <div className="text-black">
-                      <h3 className="font-bold mb-2">Location Details</h3>
-                      <p>LST: {point.lst.toFixed(1)}°C</p>
-                      <p>NDVI: {point.ndvi.toFixed(3)}</p>
-                      <p>Heat Index: {point.heatIndex.toFixed(1)}°C</p>
-                      {point.isHotspot && (
-                        <p className="text-red-600 font-bold mt-2">⚠️ Heat Hotspot</p>
-                      )}
-                    </div>
-                  </Popup>
-                </CircleMarker>
-              ))}
-            </LayersControl>
-          </MapContainer>
-        </div>
+      {/* Full-screen Map */}
+      <div className={`rounded-xl overflow-hidden border border-white/10 ${fullScreen ? 'h-[calc(100vh-200px)]' : 'h-[600px]'}`}>
+        {isMounted && (
+          <LeafletMap
+            key={`${selectedCity}-${selectedTime}`}
+            center={getCityCenter(selectedCity)}
+            heatData={heatData}
+            selectedLayer={selectedLayer}
+            getColor={getColor}
+            getRadius={getRadius}
+            fullScreen={fullScreen}
+          />
+        )}
       </div>
 
       {/* Legend */}
-      <div className="glass rounded-xl p-4">
-        <h3 className="font-semibold mb-3">Legend</h3>
+      <div className="glass-card rounded-xl p-4 border border-white/10">
+        <h3 className="font-semibold mb-3 text-white">Legend</h3>
         <div className="flex flex-wrap gap-4">
           <LegendItem color="#00ff00" label="Low" />
           <LegendItem color="#ffff00" label="Moderate" />
           <LegendItem color="#ff8800" label="High" />
           <LegendItem color="#ff0000" label="Extreme" />
           <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 rounded-full bg-isro-orange border-2 border-isro-orange"></div>
-            <span className="text-sm text-gray-400">Hotspot</span>
+            <div className="w-4 h-4 rounded-full bg-primary border-2 border-primary"></div>
+            <span className="text-sm text-text-muted">Hotspot</span>
           </div>
         </div>
       </div>
