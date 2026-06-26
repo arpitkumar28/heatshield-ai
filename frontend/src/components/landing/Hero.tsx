@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowRight, Satellite, Shield, Zap, Map, Activity, Thermometer, Users, Building2 } from 'lucide-react'
+import { ArrowRight, Satellite, Shield, Map, Activity, Thermometer, Users } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import { useState, useEffect } from 'react'
 

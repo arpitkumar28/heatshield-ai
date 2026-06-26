@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Satellite, Mail, Github, FileText, BookOpen, Building2, Shield } from 'lucide-react'
+import { Satellite, Mail, Github, Building2, Shield } from 'lucide-react'
 
 const footerLinks = {
   Platform: [

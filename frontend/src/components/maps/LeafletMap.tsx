@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 
 interface HeatDataPoint {
@@ -23,26 +22,18 @@ interface LeafletMapProps {
   fullScreen?: boolean
 }
 
-// Dynamically import the actual map component to avoid SSR issues
-const LeafletMapClient = dynamic(
+// Directly dynamic-import the Client component with SSR disabled
+// This handles the 'window is not defined' and mounting logic automatically
+const LeafletMap = dynamic(
   () => import('./LeafletMapClient'),
-  { ssr: false }
-)
-
-export default function LeafletMap(props: LeafletMapProps) {
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  if (!isMounted) {
-    return (
+  { 
+    ssr: false,
+    loading: () => (
       <div className="flex items-center justify-center h-full bg-white/5 rounded-lg">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     )
   }
+)
 
-  return <LeafletMapClient {...props} />
-}
+export default LeafletMap

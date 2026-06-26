@@ -3,7 +3,7 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react'
 import { motion } from 'framer-motion'
 
-interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onAnimationStart'> {
+interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   isLoading?: boolean
@@ -34,7 +34,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isLoading}
         whileHover={{ scale: isLoading ? 1 : 1.02 }}
         whileTap={{ scale: isLoading ? 1 : 0.98 }}
-        {...(props as any)}
+        {...props}
       >
         {isLoading && (
           <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />

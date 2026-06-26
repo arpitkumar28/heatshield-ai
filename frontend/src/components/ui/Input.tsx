@@ -4,7 +4,7 @@ import { forwardRef, InputHTMLAttributes } from 'react'
 import { motion } from 'framer-motion'
 import { LucideIcon } from 'lucide-react'
 
-interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onAnimationStart'> {
+interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onAnimationStart' | 'onDragStart' | 'onDragEnd' | 'onDrag'> {
   label?: string
   icon?: LucideIcon
   error?: string
@@ -27,7 +27,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             className={`input-field w-full ${Icon ? 'pl-10' : 'pl-4'} pr-4 ${error ? 'border-danger' : ''} ${className}`}
             whileFocus={{ scale: 1.01 }}
-            {...(props as any)}
+            {...props}
           />
         </div>
         {error && (

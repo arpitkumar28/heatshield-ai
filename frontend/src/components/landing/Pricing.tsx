@@ -72,7 +72,7 @@ export default function Pricing() {
             Simple, <span className="text-gradient">Transparent</span> Pricing
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Choose the plan that fits your city's needs
+            Choose the plan that fits your city&apos;s needs
           </p>
         </motion.div>
 

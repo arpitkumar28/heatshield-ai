@@ -1,57 +1,72 @@
 'use client'
 
-import Sidebar from '@/components/dashboard/Sidebar'
-import TopNav from '@/components/dashboard/TopNav'
-import ExecutiveMetrics from '@/components/dashboard/ExecutiveMetrics'
-import AIInsights from '@/components/dashboard/AIInsights'
-import AnalyticsCharts from '@/components/dashboard/AnalyticsCharts'
-import HeatMap from '@/components/HeatMap'
+import { EnterpriseCard } from '@/components/ui/premium'
+import ExecutiveMetrics from '@/components/dashboard/premium/ExecutiveMetrics'
+import AIInsights from '@/components/dashboard/premium/AIInsights'
+import AnalyticsCharts from '@/components/dashboard/premium/AnalyticsCharts'
+import HeatMap from '@/components/dashboard/premium/HeatMap'
+import { Activity, MapPin, Satellite, Shield, AlertTriangle, TrendingUp } from 'lucide-react'
 
 export default function Dashboard() {
   return (
-    <div className="min-h-screen bg-background">
-      <Sidebar />
-      <TopNav />
-      
-      <main className="ml-64 pt-16 p-6">
+    <div className="space-y-6">
+      {/* Enterprise Header */}
+      <div className="flex items-center justify-between">
         <div>
-          {/* Page header */}
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold mb-2">Command Center</h1>
-            <p className="text-gray-400">Real-time urban heat intelligence and monitoring</p>
-          </div>
-
-          {/* Executive Metrics */}
-          <ExecutiveMetrics />
-
-          {/* Main content grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Heat Map - takes 2 columns */}
-            <div className="xl:col-span-2">
-              <div className="glass-card rounded-xl p-6 border border-white/10 h-full">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Live Heat Map</h3>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-                    <span className="text-sm text-gray-400">Live</span>
-                  </div>
-                </div>
-                <HeatMap />
-              </div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-secondary">
+              <Satellite className="w-6 h-6 text-white" />
             </div>
-
-            {/* AI Insights Panel */}
             <div>
-              <AIInsights />
+              <h1 className="text-2xl font-display font-bold text-white tracking-wide">
+                National Command Center
+              </h1>
+              <p className="text-sm text-text-muted font-display">
+                Real-time Urban Heat Intelligence & Monitoring System
+              </p>
             </div>
-          </div>
-
-          {/* Analytics Section */}
-          <div className="mt-6">
-            <AnalyticsCharts />
           </div>
         </div>
-      </main>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-success/10 border border-success/30">
+            <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+            <span className="text-sm font-medium text-success">System Operational</span>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10">
+            <Activity className="w-4 h-4 text-primary" />
+            <span className="text-sm text-text-muted">Last Updated: 2 min ago</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Executive Metrics */}
+      <ExecutiveMetrics />
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Heat Map - takes 2 columns */}
+        <div className="xl:col-span-2">
+          <EnterpriseCard
+            title="Live Satellite Heat Map"
+            subtitle="Real-time LST data from ISRO/NRSC satellites"
+            icon={<MapPin className="w-5 h-5" />}
+            badge="Live"
+            badgeColor="success"
+          >
+            <HeatMap />
+          </EnterpriseCard>
+        </div>
+
+        {/* AI Insights Panel */}
+        <div>
+          <AIInsights />
+        </div>
+      </div>
+
+      {/* Analytics Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <AnalyticsCharts />
+      </div>
     </div>
   )
 }

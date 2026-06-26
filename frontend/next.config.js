@@ -4,14 +4,8 @@ const nextConfig = {
   images: {
     domains: ['localhost'],
   },
-  // Ensure webpack handles leaflet properly
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'leaflet': require.resolve('leaflet'),
-    }
-    return config
-  },
+  // Transpiling these packages ensures they work correctly with ESM/Next.js
+  transpilePackages: ['leaflet', 'react-leaflet'],
 }
 
 module.exports = nextConfig

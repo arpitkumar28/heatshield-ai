@@ -3,13 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Layers, Clock, MapPin } from 'lucide-react'
 import { analyticsAPI } from '@/lib/api'
-import dynamic from 'next/dynamic'
-
-// Dynamically import LeafletMap to avoid SSR issues with leaflet
-const LeafletMap = dynamic(
-  () => import('@/components/maps/LeafletMap'),
-  { ssr: false }
-)
+import LeafletMap from '@/components/maps/LeafletMap'
 
 interface HeatDataPoint {
   id: number
@@ -30,7 +24,6 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
   const [heatmapData, setHeatmapData] = useState<any>(null)
   const [isMounted, setIsMounted] = useState(false)
   const [selectedTime, setSelectedTime] = useState('current')
-  const [showLayerPanel, setShowLayerPanel] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
@@ -42,7 +35,6 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
       const response = await analyticsAPI.getHeatmap(selectedCity)
       setHeatmapData(response.data)
 
-      // Transform hotspots into heat data points
       const transformedData: HeatDataPoint[] = response.data.hotspots.map((hotspot: any, index: number) => ({
         id: index,
         lat: hotspot.lat,
@@ -129,10 +121,8 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
 
   return (
     <div className="space-y-4">
-      {/* Enhanced Map Controls */}
       <div className="glass-card rounded-xl p-4 border border-white/10">
         <div className="flex flex-wrap items-center gap-4">
-          {/* City Selector */}
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4 text-primary" />
             <select
@@ -151,7 +141,6 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
             </select>
           </div>
 
-          {/* Time Slider */}
           <div className="flex items-center gap-2 flex-1 min-w-[200px]">
             <Clock className="w-4 h-4 text-primary" />
             <select
@@ -169,7 +158,6 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
             </select>
           </div>
 
-          {/* Layer Controls */}
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-primary" />
             <button
@@ -206,11 +194,9 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
         </div>
       </div>
 
-      {/* Full-screen Map */}
       <div className={`rounded-xl overflow-hidden border border-white/10 ${fullScreen ? 'h-[calc(100vh-200px)]' : 'h-[600px]'}`}>
         {isMounted && (
           <LeafletMap
-            key={`${selectedCity}-${selectedTime}`}
             center={getCityCenter(selectedCity)}
             heatData={heatData}
             selectedLayer={selectedLayer}
@@ -221,7 +207,6 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
         )}
       </div>
 
-      {/* Legend */}
       <div className="glass-card rounded-xl p-4 border border-white/10">
         <h3 className="font-semibold mb-3 text-white">Legend</h3>
         <div className="flex flex-wrap gap-4">
@@ -235,30 +220,6 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-function StatCard({ icon, title, value, change, color }: any) {
-  const colorClasses = {
-    'isro-orange': 'text-isro-orange',
-    'red': 'text-red-500',
-    'green': 'text-green-500',
-    'isro-accent': 'text-isro-accent'
-  }
-
-  return (
-    <div className="glass rounded-lg p-4 hover:border-isro-orange/50 transition-all">
-      <div className="flex items-center justify-between mb-2">
-        <div className={`p-2 rounded-lg bg-white/10 ${colorClasses[color as keyof typeof colorClasses]}`}>
-          {icon}
-        </div>
-        <span className={`text-sm ${change.startsWith('+') ? 'text-red-400' : 'text-green-400'}`}>
-          {change}
-        </span>
-      </div>
-      <p className="text-gray-400 text-sm">{title}</p>
-      <p className="text-2xl font-bold">{value}</p>
     </div>
   )
 }
