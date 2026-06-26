@@ -420,14 +420,20 @@ function ComplianceCard({ name, status, lastAudit, score }: { name: string; stat
   )
 }
 
-function ComplianceItem({ title, status, description }: any) {
+interface ComplianceItemProps {
+  title: string
+  status: 'compliant' | 'review' | 'non_compliant'
+  description: string
+}
+
+function ComplianceItem({ title, status, description }: ComplianceItemProps) {
   const statusConfig = {
     compliant: { icon: CheckCircle, color: 'text-green-400' },
     review: { icon: Clock, color: 'text-yellow-400' },
     non_compliant: { icon: AlertTriangle, color: 'text-red-400' }
   }
 
-  const config = statusConfig[status as keyof typeof statusConfig]
+  const config = statusConfig[status]
   const Icon = config.icon
 
   return (
@@ -448,7 +454,14 @@ function ComplianceItem({ title, status, description }: any) {
   )
 }
 
-function PolicyCard({ name, status, lastUpdated, enforced }: any) {
+interface PolicyCardProps {
+  name: string
+  status: string
+  lastUpdated: string
+  enforced: boolean
+}
+
+function PolicyCard({ name, status, lastUpdated, enforced }: PolicyCardProps) {
   return (
     <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
       <div>

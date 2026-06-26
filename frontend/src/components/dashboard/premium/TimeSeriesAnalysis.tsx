@@ -93,7 +93,7 @@ export default function TimeSeriesAnalysis() {
             <TrendingUp className="w-4 h-4 text-text-muted" />
             <select
               value={selectedMetric}
-              onChange={(e) => setSelectedMetric(e.target.value as any)}
+              onChange={(e) => setSelectedMetric(e.target.value as 'temperature' | 'heatIndex' | 'humidity' | 'windSpeed' | 'ndvi')}
               className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-primary"
             >
               <option value="temperature">Temperature</option>
@@ -194,7 +194,13 @@ export default function TimeSeriesAnalysis() {
   )
 }
 
-function StatCard({ title, value, icon }: any) {
+interface StatCardProps {
+  title: string
+  value: string
+  icon: React.ReactNode
+}
+
+function StatCard({ title, value, icon }: StatCardProps) {
   return (
     <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl p-4 border border-white/10">
       <div className="flex items-center gap-2 mb-2">

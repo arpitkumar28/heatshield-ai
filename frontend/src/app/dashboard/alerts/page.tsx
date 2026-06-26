@@ -6,7 +6,7 @@ import TopNav from '@/components/dashboard/TopNav'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
-import { AlertTriangle, Clock, MapPin, Filter, Bell, CheckCircle, XCircle } from 'lucide-react'
+import { Clock, MapPin, Filter, Bell, CheckCircle } from 'lucide-react'
 
 const alerts = [
   {

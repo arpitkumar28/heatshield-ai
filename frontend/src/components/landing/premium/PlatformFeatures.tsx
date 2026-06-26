@@ -24,44 +24,72 @@ const features = [
     title: 'Risk Assessment',
     description: 'Comprehensive vulnerability analysis for infrastructure, populations, and critical assets with automated scoring.',
     highlights: ['Infrastructure Risk', 'Population Vulnerability', 'Asset Protection', 'Impact Modeling'],
-    color: 'heat-orange',
+    color: 'orange',
   },
   {
     icon: AlertTriangle,
     title: 'Smart Alerting',
     description: 'Intelligent early warning system with multi-channel notifications, escalation protocols, and response coordination.',
     highlights: ['Multi-channel Alerts', 'Escalation Rules', 'Response Teams', 'SOS Integration'],
-    color: 'heat-red',
+    color: 'danger',
   },
   {
     icon: BarChart3,
     title: 'Executive Analytics',
     description: 'Command center dashboards with KPIs, trend analysis, and executive reporting for decision-makers.',
     highlights: ['Real-time KPIs', 'Trend Analysis', 'Executive Reports', 'Custom Dashboards'],
-    color: 'heat-green',
+    color: 'success',
   },
   {
     icon: Satellite,
     title: 'Satellite Integration',
     description: 'Direct integration with ISRO/NRSC satellite feeds for continuous thermal monitoring and change detection.',
     highlights: ['ISRO Feed', 'NRSC Data', 'Change Detection', 'Historical Analysis'],
-    color: 'heat-blue',
+    color: 'blue',
   },
   {
     icon: Users,
     title: 'Citizen Portal',
     description: 'Public-facing platform for heat index information, cooling center locations, and emergency services.',
     highlights: ['Heat Index', 'Cooling Centers', 'Emergency Services', 'Health Advisory'],
-    color: 'heat-yellow',
+    color: 'warning',
   },
   {
     icon: Zap,
     title: 'Smart Recommendations',
     description: 'AI-generated mitigation strategies including green infrastructure, cool pavements, and urban planning solutions.',
     highlights: ['Green Roofs', 'Cool Pavements', 'Urban Forests', 'Cost Estimates'],
-    color: 'heat-dark-red',
+    color: 'red-800',
   },
 ]
+
+const getFeatureColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    primary: 'bg-primary/10 border-primary/30',
+    secondary: 'bg-secondary/10 border-secondary/30',
+    orange: 'bg-orange/10 border-orange/30',
+    danger: 'bg-danger/10 border-danger/30',
+    success: 'bg-success/10 border-success/30',
+    blue: 'bg-blue/10 border-blue/30',
+    warning: 'bg-warning/10 border-warning/30',
+    'red-800': 'bg-red-800/10 border-red-800/30',
+  }
+  return colorMap[color] || 'bg-primary/10 border-primary/30'
+}
+
+const getFeatureTextColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    primary: 'text-primary',
+    secondary: 'text-secondary',
+    orange: 'text-orange',
+    danger: 'text-danger',
+    success: 'text-success',
+    blue: 'text-blue',
+    warning: 'text-warning',
+    'red-800': 'text-red-800',
+  }
+  return colorMap[color] || 'text-primary'
+}
 
 export default function PremiumPlatformFeatures() {
   return (
@@ -121,9 +149,9 @@ export default function PremiumPlatformFeatures() {
                   whileInView={{ scale: 1, rotate: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 + 0.2 }}
-                  className={`w-16 h-16 rounded-2xl bg-${feature.color}/10 border border-${feature.color}/30 flex items-center justify-center mb-6`}
+                  className={`w-16 h-16 rounded-2xl border flex items-center justify-center mb-6 ${getFeatureColorClass(feature.color)}`}
                 >
-                  <feature.icon className={`w-8 h-8 text-${feature.color}`} />
+                  <feature.icon className={`w-8 h-8 ${getFeatureTextColorClass(feature.color)}`} />
                 </motion.div>
 
                 {/* Content */}
@@ -173,12 +201,12 @@ export default function PremiumPlatformFeatures() {
                 <p className="text-sm text-text-muted">Comprehensive coverage of all major cities and urban centers</p>
               </div>
               <div className="space-y-3">
-                <Lock className="w-8 h-8 text-heat-green mb-2" />
+                <Lock className="w-8 h-8 text-success mb-2" />
                 <h4 className="font-display text-lg font-bold text-white">Secure</h4>
                 <p className="text-sm text-text-muted">Enterprise-grade security with role-based access control</p>
               </div>
               <div className="space-y-3">
-                <Smartphone className="w-8 h-8 text-heat-orange mb-2" />
+                <Smartphone className="w-8 h-8 text-orange mb-2" />
                 <h4 className="font-display text-lg font-bold text-white">Mobile-First</h4>
                 <p className="text-sm text-text-muted">Native mobile apps with offline capabilities and push notifications</p>
               </div>

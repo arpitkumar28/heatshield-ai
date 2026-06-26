@@ -23,19 +23,19 @@ export default function PremiumInteractiveIndiaMap() {
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case 'critical': return 'bg-heat-red'
-      case 'high': return 'bg-heat-orange'
-      case 'medium': return 'bg-heat-yellow'
-      default: return 'bg-heat-green'
+      case 'critical': return 'bg-danger'
+      case 'high': return 'bg-orange'
+      case 'medium': return 'bg-warning'
+      default: return 'bg-success'
     }
   }
 
   const getRiskBorderColor = (risk: string) => {
     switch (risk) {
-      case 'critical': return 'border-heat-red'
-      case 'high': return 'border-heat-orange'
-      case 'medium': return 'border-heat-yellow'
-      default: return 'border-heat-green'
+      case 'critical': return 'border-danger'
+      case 'high': return 'border-orange'
+      case 'medium': return 'border-warning'
+      default: return 'border-success'
     }
   }
 
@@ -85,7 +85,7 @@ export default function PremiumInteractiveIndiaMap() {
             className="lg:col-span-2"
           >
             <PremiumCard variant="glass" padding="none" className="overflow-hidden">
-              <div className="relative h-[600px] bg-gradient-to-br from-background-dark to-background">
+              <div className="relative min-h-[500px] bg-gradient-to-br from-background-dark to-background">
                 {/* Grid overlay */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:50px_50px]" />
                 
@@ -166,7 +166,7 @@ export default function PremiumInteractiveIndiaMap() {
                     </div>
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-xs text-text-muted">Avg Temperature</span>
-                      <span className="text-sm font-semibold text-heat-orange">41.2°C</span>
+                      <span className="text-sm font-semibold text-orange">41.2°C</span>
                     </div>
                   </div>
                 </div>
@@ -191,7 +191,7 @@ export default function PremiumInteractiveIndiaMap() {
                       <h3 className="font-display text-2xl font-bold text-white">{selectedCity.name}</h3>
                     </div>
                     <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${getRiskColor(selectedCity.risk)}/20 border ${getRiskBorderColor(selectedCity.risk)}/30`}>
-                      <AlertTriangle className={`w-4 h-4 text-${selectedCity.risk === 'critical' ? 'heat-red' : selectedCity.risk === 'high' ? 'heat-orange' : 'heat-yellow'}`} />
+                      <AlertTriangle className={`w-4 h-4 ${selectedCity.risk === 'critical' ? 'text-danger' : selectedCity.risk === 'high' ? 'text-orange' : 'text-warning'}`} />
                       <span className="text-sm font-semibold capitalize">{selectedCity.risk} Risk</span>
                     </div>
                   </div>
@@ -199,11 +199,11 @@ export default function PremiumInteractiveIndiaMap() {
                   {/* Temperature */}
                   <div className="glass-card rounded-lg p-4 border border-white/10">
                     <div className="flex items-center gap-3 mb-2">
-                      <Thermometer className="w-5 h-5 text-heat-orange" />
+                      <Thermometer className="w-5 h-5 text-orange" />
                       <span className="text-sm text-text-muted">Current Temperature</span>
                     </div>
                     <div className="font-display text-4xl font-bold text-white">{selectedCity.temp}°C</div>
-                    <div className="text-sm text-danger mt-1">↑ 2.5°C above normal</div>
+                    <div className="text-sm text-orange mt-1">↑ 2.5°C above normal</div>
                   </div>
 
                   {/* Population */}

@@ -20,7 +20,7 @@ export default function PerformanceMonitoring() {
     throughput: 1250
   }
 
-  const serviceStatus = [
+  const serviceStatus: Array<{ name: string; status: 'healthy' | 'degraded' | 'critical'; uptime: string; responseTime: string }> = [
     { name: 'API Server', status: 'healthy', uptime: '99.9%', responseTime: '45ms' },
     { name: 'Database', status: 'healthy', uptime: '99.8%', responseTime: '12ms' },
     { name: 'Redis Cache', status: 'healthy', uptime: '99.9%', responseTime: '2ms' },
@@ -28,7 +28,7 @@ export default function PerformanceMonitoring() {
     { name: 'CDN', status: 'healthy', uptime: '99.9%', responseTime: '25ms' },
   ]
 
-  const performanceAlerts = [
+  const performanceAlerts: Array<{ id: number; severity: 'high' | 'medium' | 'low' | 'info'; message: string; time: string; metric: string }> = [
     { id: 1, severity: 'high', message: 'AI Services response time degraded', time: '5 min ago', metric: 'Response Time' },
     { id: 2, severity: 'medium', message: 'Memory usage above threshold', time: '15 min ago', metric: 'Memory' },
     { id: 3, severity: 'low', message: 'Database connection pool near capacity', time: '30 min ago', metric: 'Connections' },
@@ -341,7 +341,14 @@ export default function PerformanceMonitoring() {
   )
 }
 
-function TabButton({ icon, label, active, onClick }: any) {
+interface TabButtonProps {
+  icon: React.ReactNode
+  label: string
+  active: boolean
+  onClick: () => void
+}
+
+function TabButton({ icon, label, active, onClick }: TabButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -357,14 +364,22 @@ function TabButton({ icon, label, active, onClick }: any) {
   )
 }
 
-function MetricCard({ title, value, icon, trend, data }: any) {
+interface MetricCardProps {
+  title: string
+  value: string
+  icon: React.ReactNode
+  trend: 'up' | 'down' | 'stable'
+  data: number[]
+}
+
+function MetricCard({ title, value, icon, trend, data }: MetricCardProps) {
   const trendConfig = {
     up: { icon: TrendingUp, color: 'text-red-400' },
     down: { icon: TrendingDown, color: 'text-green-400' },
     stable: { icon: Activity, color: 'text-blue-400' }
   }
 
-  const config = trendConfig[trend as keyof typeof trendConfig]
+  const config = trendConfig[trend]
   const TrendIcon = config.icon
 
   return (
@@ -390,14 +405,22 @@ function MetricCard({ title, value, icon, trend, data }: any) {
   )
 }
 
-function ServiceStatusCard({ service }: any) {
+interface ServiceStatusCardProps {
+  service: {
+    name: string
+    status: 'healthy' | 'degraded' | 'critical'
+    responseTime: string
+  }
+}
+
+function ServiceStatusCard({ service }: ServiceStatusCardProps) {
   const statusConfig = {
     healthy: { color: 'text-green-400', bg: 'bg-green-500/20', icon: CheckCircle },
     degraded: { color: 'text-yellow-400', bg: 'bg-yellow-500/20', icon: AlertTriangle },
     critical: { color: 'text-red-400', bg: 'bg-red-500/20', icon: XCircle }
   }
 
-  const config = statusConfig[service.status as keyof typeof statusConfig]
+  const config = statusConfig[service.status]
   const StatusIcon = config.icon
 
   return (
@@ -414,7 +437,16 @@ function ServiceStatusCard({ service }: any) {
   )
 }
 
-function PerformanceAlert({ alert }: any) {
+interface PerformanceAlertProps {
+  alert: {
+    severity: 'high' | 'medium' | 'low' | 'info'
+    message: string
+    time: string
+    metric: string
+  }
+}
+
+function PerformanceAlert({ alert }: PerformanceAlertProps) {
   const severityColors = {
     high: 'bg-red-500/20 text-red-400 border-red-500/30',
     medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
@@ -423,7 +455,7 @@ function PerformanceAlert({ alert }: any) {
   }
 
   return (
-    <div className={`flex items-center gap-3 p-3 rounded-lg border ${severityColors[alert.severity as keyof typeof severityColors]}`}>
+    <div className={`flex items-center gap-3 p-3 rounded-lg border ${severityColors[alert.severity]}`}>
       <AlertTriangle className="w-4 h-4" />
       <div className="flex-1">
         <p className="text-sm text-white">{alert.message}</p>
@@ -433,7 +465,16 @@ function PerformanceAlert({ alert }: any) {
   )
 }
 
-function DetailedMetricCard({ title, current, average, peak, icon, trend }: any) {
+interface DetailedMetricCardProps {
+  title: string
+  current: string
+  average: string
+  peak: string
+  icon: React.ReactNode
+  trend: 'up' | 'down' | 'stable'
+}
+
+function DetailedMetricCard({ title, current, average, peak, icon, trend }: DetailedMetricCardProps) {
   const trendConfig = {
     up: { color: 'text-red-400' },
     down: { color: 'text-green-400' },
@@ -464,7 +505,14 @@ function DetailedMetricCard({ title, current, average, peak, icon, trend }: any)
   )
 }
 
-function DatabaseMetric({ title, value, max, percentage }: any) {
+interface DatabaseMetricProps {
+  title: string
+  value: string
+  max: string
+  percentage: string
+}
+
+function DatabaseMetric({ title, value, max, percentage }: DatabaseMetricProps) {
   return (
     <div className="bg-white/5 rounded-lg p-3">
       <p className="text-xs text-text-muted mb-1">{title}</p>
@@ -480,7 +528,14 @@ function DatabaseMetric({ title, value, max, percentage }: any) {
   )
 }
 
-function LogEntry({ timestamp, level, service, message }: any) {
+interface LogEntryProps {
+  timestamp: string
+  level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG'
+  service: string
+  message: string
+}
+
+function LogEntry({ timestamp, level, service, message }: LogEntryProps) {
   const levelColors = {
     INFO: 'text-blue-400',
     WARN: 'text-yellow-400',
@@ -491,14 +546,20 @@ function LogEntry({ timestamp, level, service, message }: any) {
   return (
     <div className="flex items-start gap-3 p-2 bg-white/5 rounded">
       <span className="text-text-muted text-xs">{timestamp}</span>
-      <span className={`text-xs font-medium ${levelColors[level as keyof typeof levelColors]}`}>{level}</span>
+      <span className={`text-xs font-medium ${levelColors[level]}`}>{level}</span>
       <span className="text-text-muted text-xs">{service}</span>
       <span className="text-white text-xs flex-1">{message}</span>
     </div>
   )
 }
 
-function AlertSummaryCard({ title, count, color }: any) {
+interface AlertSummaryCardProps {
+  title: string
+  count: number
+  color: 'red' | 'orange' | 'yellow' | 'blue'
+}
+
+function AlertSummaryCard({ title, count, color }: AlertSummaryCardProps) {
   const colorConfig = {
     red: { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30' },
     orange: { bg: 'bg-orange-500/20', text: 'text-orange-400', border: 'border-orange-500/30' },
@@ -506,7 +567,7 @@ function AlertSummaryCard({ title, count, color }: any) {
     blue: { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/30' }
   }
 
-  const config = colorConfig[color as keyof typeof colorConfig]
+  const config = colorConfig[color]
 
   return (
     <div className={`bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl p-4 border ${config.border}`}>
@@ -516,7 +577,14 @@ function AlertSummaryCard({ title, count, color }: any) {
   )
 }
 
-function AlertThreshold({ title, description, threshold, enabled }: any) {
+interface AlertThresholdProps {
+  title: string
+  description: string
+  threshold: string
+  enabled: boolean
+}
+
+function AlertThreshold({ title, description, threshold, enabled }: AlertThresholdProps) {
   return (
     <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
       <div>

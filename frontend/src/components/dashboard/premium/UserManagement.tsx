@@ -159,10 +159,10 @@ export default function UserManagement() {
 
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard title="Total Users" value={users.length} icon={<Users className="w-5 h-5" />} />
-          <StatCard title="Active Users" value={users.filter(u => u.status === 'active').length} icon={<CheckCircle className="w-5 h-5 text-green-500" />} />
-          <StatCard title="Pending Approvals" value={users.filter(u => u.status === 'pending').length} icon={<Clock className="w-5 h-5 text-yellow-500" />} />
-          <StatCard title="Administrators" value={users.filter(u => u.role === 'admin').length} icon={<Shield className="w-5 h-5 text-red-500" />} />
+          <StatCard title="Total Users" value={users.length.toString()} icon={<Users className="w-5 h-5" />} />
+          <StatCard title="Active Users" value={users.filter(u => u.status === 'active').length.toString()} icon={<CheckCircle className="w-5 h-5 text-green-500" />} />
+          <StatCard title="Pending Approvals" value={users.filter(u => u.status === 'pending').length.toString()} icon={<Clock className="w-5 h-5 text-yellow-500" />} />
+          <StatCard title="Administrators" value={users.filter(u => u.role === 'admin').length.toString()} icon={<Shield className="w-5 h-5 text-red-500" />} />
         </div>
 
         {/* User Table */}
@@ -276,7 +276,13 @@ export default function UserManagement() {
   )
 }
 
-function StatCard({ title, value, icon }: any) {
+interface StatCardProps {
+  title: string
+  value: string
+  icon: React.ReactNode
+}
+
+function StatCard({ title, value, icon }: StatCardProps) {
   return (
     <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl p-4 border border-white/10">
       <div className="flex items-center gap-2 mb-2">

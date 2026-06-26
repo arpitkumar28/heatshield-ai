@@ -17,14 +17,14 @@ const pipelineStages = [
     title: 'Weather Data',
     description: 'Meteorological inputs including temperature, humidity, wind patterns, and atmospheric conditions.',
     tech: ['IMD Data', 'AWS Stations', 'Sensors'],
-    color: 'heat-blue',
+    color: 'blue',
   },
   {
     icon: Leaf,
     title: 'NDVI Analysis',
     description: 'Vegetation health assessment through Normalized Difference Vegetation Index processing.',
     tech: ['Green Cover', 'Parks', 'Urban Forests'],
-    color: 'heat-green',
+    color: 'success',
   },
   {
     icon: Brain,
@@ -38,23 +38,49 @@ const pipelineStages = [
     title: 'Prediction Engine',
     description: 'Forecast heat wave events 72 hours in advance with confidence intervals and risk assessment.',
     tech: ['Time Series', 'Ensemble', 'Probabilistic'],
-    color: 'heat-yellow',
+    color: 'warning',
   },
   {
     icon: Lightbulb,
     title: 'Smart Recommendations',
     description: 'AI-generated mitigation strategies tailored to specific urban contexts and infrastructure.',
     tech: ['Green Roofs', 'Cool Pavements', 'Urban Forests'],
-    color: 'heat-orange',
+    color: 'orange',
   },
   {
     icon: CheckCircle,
     title: 'Impact Monitoring',
     description: 'Continuous tracking of intervention effectiveness and long-term urban heat reduction.',
     tech: ['Before/After', 'KPIs', 'Reports'],
-    color: 'heat-red',
+    color: 'danger',
   },
 ]
+
+const getStageColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    primary: 'bg-primary/10 border-primary/30',
+    blue: 'bg-blue/10 border-blue/30',
+    success: 'bg-success/10 border-success/30',
+    secondary: 'bg-secondary/10 border-secondary/30',
+    warning: 'bg-warning/10 border-warning/30',
+    orange: 'bg-orange/10 border-orange/30',
+    danger: 'bg-danger/10 border-danger/30',
+  }
+  return colorMap[color] || 'bg-primary/10 border-primary/30'
+}
+
+const getStageTextColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    primary: 'text-primary',
+    blue: 'text-blue',
+    success: 'text-success',
+    secondary: 'text-secondary',
+    warning: 'text-warning',
+    orange: 'text-orange',
+    danger: 'text-danger',
+  }
+  return colorMap[color] || 'text-primary'
+}
 
 export default function PremiumAIPipeline() {
   return (
@@ -116,7 +142,7 @@ export default function PremiumAIPipeline() {
         {/* Pipeline visualization */}
         <div className="relative">
           {/* Connection line */}
-          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-secondary to-heat-orange opacity-30" />
+          <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-secondary to-orange opacity-30" />
           
           {/* Pipeline stages */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -147,9 +173,9 @@ export default function PremiumAIPipeline() {
                     whileInView={{ scale: 1, rotate: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: index * 0.1 + 0.3 }}
-                    className={`w-16 h-16 rounded-2xl bg-${stage.color}/10 border border-${stage.color}/30 flex items-center justify-center mb-6`}
+                    className={`w-16 h-16 rounded-2xl border flex items-center justify-center mb-6 ${getStageColorClass(stage.color)}`}
                   >
-                    <stage.icon className={`w-8 h-8 text-${stage.color}`} />
+                    <stage.icon className={`w-8 h-8 ${getStageTextColorClass(stage.color)}`} />
                   </motion.div>
 
                   {/* Content */}
@@ -237,13 +263,13 @@ export default function PremiumAIPipeline() {
               {/* Output */}
               <div className="space-y-4">
                 <div className="flex items-center gap-3 mb-4">
-                  <Zap className="w-6 h-6 text-heat-orange" />
+                  <Zap className="w-6 h-6 text-orange" />
                   <h4 className="font-display text-lg font-bold text-white">Intelligence Output</h4>
                 </div>
                 <div className="space-y-3">
                   {['Heat Maps (Real-time)', 'Risk Scores (Per location)', 'Alerts (Automated)', 'Recommendations (AI-generated)'].map((item) => (
                     <div key={item} className="flex items-center gap-2 text-sm text-text-muted">
-                      <div className="w-1.5 h-1.5 rounded-full bg-heat-orange" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-orange" />
                       <span>{item}</span>
                     </div>
                   ))}

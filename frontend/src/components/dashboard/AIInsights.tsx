@@ -1,6 +1,6 @@
 'use client'
 
-import { Brain, AlertTriangle, TrendingUp, Lightbulb, ArrowRight, Building2, MapPin, Calendar, CheckCircle, Clock } from 'lucide-react'
+import { Brain, Lightbulb, ArrowRight, Building2, MapPin, CheckCircle, Clock } from 'lucide-react'
 
 const recommendations = [
   {

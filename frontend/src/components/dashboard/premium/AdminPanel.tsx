@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Shield, Settings, Database, Activity, Users, AlertTriangle, CheckCircle, Clock, TrendingUp, Server, Lock, Key, Globe, FileText, Bell } from 'lucide-react'
+import { Shield, Settings, Activity, Users, AlertTriangle, Server, Lock, Key, Globe, FileText, Bell, Database } from 'lucide-react'
 import { EnterpriseCard } from '@/components/ui/premium'
 
 export default function AdminPanel() {

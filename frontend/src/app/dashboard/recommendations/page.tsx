@@ -6,7 +6,7 @@ import TopNav from '@/components/dashboard/TopNav'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
-import { Shield, Clock, Users, DollarSign, ArrowRight, CheckCircle } from 'lucide-react'
+import { Shield, Clock, Users, DollarSign, ArrowRight } from 'lucide-react'
 
 const recommendations = [
   {

@@ -5,7 +5,7 @@ import ExecutiveMetrics from '@/components/dashboard/premium/ExecutiveMetrics'
 import AIInsights from '@/components/dashboard/premium/AIInsights'
 import AnalyticsCharts from '@/components/dashboard/premium/AnalyticsCharts'
 import HeatMap from '@/components/dashboard/premium/HeatMap'
-import { Activity, MapPin, Satellite, Shield, AlertTriangle, TrendingUp } from 'lucide-react'
+import { Activity, MapPin, Satellite } from 'lucide-react'
 
 export default function Dashboard() {
   return (

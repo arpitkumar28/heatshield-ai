@@ -4,20 +4,21 @@
 
 :root {
   --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 6, 11, 20;
-  --background-end-rgb: 11, 18, 32;
+  --background-start-rgb: 4, 8, 18;
+  --background-end-rgb: 8, 16, 32;
   
-  /* Enterprise Design Tokens */
-  --color-primary: #00C8FF;
+  /* Premium Enterprise Design Tokens */
+  --color-primary: #1FA2FF;
   --color-secondary: #3B82F6;
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-danger: #EF4444;
+  --color-accent: #00E5FF;
+  --color-success: #00D68F;
+  --color-warning: #FFB020;
+  --color-danger: #FF5C5C;
   --color-info: #06B6D4;
   
-  --color-background: #060B14;
-  --color-surface: #0B1220;
-  --color-card: #111827;
+  --color-background: #040812;
+  --color-surface: #0A1020;
+  --color-card: #0E1628;
   --color-border: rgba(255, 255, 255, 0.08);
   
   --elevation-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -157,6 +158,14 @@ body {
   transition: all var(--transition-base);
 }
 
+.rounded-card {
+  border-radius: 16px;
+}
+
+.rounded-premium {
+  border-radius: 20px;
+}
+
 /* Premium Border Effects */
 .gradient-border {
   position: relative;
@@ -171,7 +180,7 @@ body {
   inset: 0;
   border-radius: 16px;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(0, 200, 255, 0.4), rgba(59, 130, 246, 0.4));
+  background: linear-gradient(135deg, rgba(31, 162, 255, 0.4), rgba(59, 130, 246, 0.4));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -207,13 +216,15 @@ body {
   font-weight: 600;
   transition: all var(--transition-base);
   border: none;
-  box-shadow: 0 4px 12px rgba(0, 200, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(31, 162, 255, 0.3);
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 200, 255, 0.4);
+  box-shadow: 0 8px 24px rgba(31, 162, 255, 0.4);
 }
 
 .btn-primary:active {
@@ -227,19 +238,19 @@ body {
 }
 
 .btn-secondary {
-  background: rgba(0, 200, 255, 0.1);
+  background: rgba(31, 162, 255, 0.1);
   color: var(--color-primary);
   padding: 12px 24px;
   border-radius: 12px;
   font-weight: 600;
-  border: 1px solid rgba(0, 200, 255, 0.2);
+  border: 1px solid rgba(31, 162, 255, 0.2);
   transition: all var(--transition-base);
   cursor: pointer;
 }
 
 .btn-secondary:hover {
-  background: rgba(0, 200, 255, 0.15);
-  border-color: rgba(0, 200, 255, 0.3);
+  background: rgba(31, 162, 255, 0.15);
+  border-color: rgba(31, 162, 255, 0.3);
   transform: translateY(-2px);
 }
 

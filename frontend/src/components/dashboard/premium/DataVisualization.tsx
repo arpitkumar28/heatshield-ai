@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Treemap } from 'recharts'
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts'
 import { TrendingUp, BarChart3, PieChart, Activity, Download, Filter, Calendar, Maximize2, RefreshCw } from 'lucide-react'
 import { EnterpriseCard } from '@/components/ui/premium'
 
@@ -11,7 +11,7 @@ interface DataVisualizationProps {
 }
 
 export default function DataVisualization({ title = 'Data Visualization', compact = false }: DataVisualizationProps) {
-  const [selectedChart, setSelectedChart] = useState<'line' | 'area' | 'bar' | 'scatter' | 'radar' | 'treemap'>('line')
+  const [selectedChart, setSelectedChart] = useState<'line' | 'area' | 'bar' | 'scatter' | 'radar'>('line')
   const [timeRange, setTimeRange] = useState('6m')
   const [isFullscreen, setIsFullscreen] = useState(false)
 
@@ -33,13 +33,6 @@ export default function DataVisualization({ title = 'Data Visualization', compac
     { subject: 'Albedo', A: 55, B: 60, fullMark: 100 },
   ]
 
-  const treemapData = [
-    { name: 'Residential', size: 400, color: '#0066CC' },
-    { name: 'Commercial', size: 300, color: '#FF6B35' },
-    { name: 'Industrial', size: 200, color: '#00CC66' },
-    { name: 'Green Spaces', size: 150, color: '#00FF00' },
-    { name: 'Water Bodies', size: 100, color: '#0099FF' },
-  ]
 
   const scatterData = [
     { x: 30, y: 28, z: 100 },

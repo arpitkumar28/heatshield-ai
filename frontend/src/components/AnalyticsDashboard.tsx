@@ -31,7 +31,7 @@ const interventionData = [
 
 export default function AnalyticsDashboard() {
   const [timeRange, setTimeRange] = useState('6m')
-  const [summary, setSummary] = useState<any>(null)
+  const [summary, setSummary] = useState<Record<string, unknown> | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -84,14 +84,14 @@ export default function AnalyticsDashboard() {
         />
         <KPICard
           title="NDVI Score"
-          value={loading ? "Loading..." : summary?.ndvi_score?.toFixed(4) || "0.0000"}
+          value={loading ? "Loading..." : typeof summary?.ndvi_score === 'number' ? summary.ndvi_score.toFixed(4) : "0.0000"}
           change=""
           icon={<CheckCircle className="w-5 h-5 text-isro-accent" />}
           trend="up"
         />
         <KPICard
           title="Hotspot Count"
-          value={loading ? "Loading..." : summary?.hotspot_count || 0}
+          value={loading ? "Loading..." : String(summary?.hotspot_count || 0)}
           change=""
           icon={<TrendingUp className="w-5 h-5 text-isro-orange" />}
           trend="up"
@@ -211,7 +211,15 @@ export default function AnalyticsDashboard() {
   )
 }
 
-function KPICard({ title, value, change, icon, trend }: any) {
+interface KPICardProps {
+  title: string
+  value: string
+  change: string
+  icon: React.ReactNode
+  trend: 'up' | 'down'
+}
+
+function KPICard({ title, value, change, icon, trend }: KPICardProps) {
   const trendColors = {
     up: trend === 'down' ? 'text-green-400' : 'text-red-400',
     down: trend === 'down' ? 'text-green-400' : 'text-red-400'
@@ -221,7 +229,7 @@ function KPICard({ title, value, change, icon, trend }: any) {
     <div className="glass rounded-lg p-4 hover:border-isro-orange/50 transition-all">
       <div className="flex items-center justify-between mb-2">
         <div className="p-2 rounded-lg bg-white/10">{icon}</div>
-        <span className={`text-sm ${trendColors[trend as keyof typeof trendColors]}`}>
+        <span className={`text-sm ${trendColors[trend]}`}>
           {change}
         </span>
       </div>
@@ -231,7 +239,15 @@ function KPICard({ title, value, change, icon, trend }: any) {
   )
 }
 
-function TableRow({ metric, current, previous, change, status }: any) {
+interface TableRowProps {
+  metric: string
+  current: string
+  previous: string
+  change: string
+  status: 'success' | 'warning' | 'danger' | 'info'
+}
+
+function TableRow({ metric, current, previous, change, status }: TableRowProps) {
   const statusStyles = {
     success: 'bg-green-500/20 text-green-400',
     warning: 'bg-yellow-500/20 text-yellow-400',
@@ -248,7 +264,7 @@ function TableRow({ metric, current, previous, change, status }: any) {
         {change}
       </td>
       <td className="py-3 px-4">
-        <span className={`px-2 py-1 rounded text-xs ${statusStyles[status as keyof typeof statusStyles]}`}>
+        <span className={`px-2 py-1 rounded text-xs ${statusStyles[status]}`}>
           {status.charAt(0).toUpperCase() + status.slice(1)}
         </span>
       </td>

@@ -218,7 +218,7 @@ export default function PremiumHero() {
             className="relative"
           >
             {/* Main visualization container */}
-            <div className="relative w-full aspect-square max-w-2xl mx-auto">
+            <div className="relative w-full aspect-square max-w-2xl mx-auto min-h-[500px]">
               {/* Outer glow */}
               <motion.div
                 animate={{ 

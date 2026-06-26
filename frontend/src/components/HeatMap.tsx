@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Layers, Clock, MapPin } from 'lucide-react'
 import { analyticsAPI } from '@/lib/api'
-import LeafletMap from '@/components/maps/LeafletMap'
+import GISMap from '@/components/maps/GISMap'
+import { MapErrorBoundary } from '@/components/maps/MapErrorBoundary'
 
 interface HeatDataPoint {
   id: number
@@ -16,12 +17,23 @@ interface HeatDataPoint {
   timestamp: string
 }
 
+interface HotspotData {
+  lat: number
+  lng: number
+  temperature: number
+  risk_level: string
+}
+
+interface LegendItemProps {
+  color: string
+  label: string
+}
+
 export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }) {
   const [heatData, setHeatData] = useState<HeatDataPoint[]>([])
   const [selectedLayer, setSelectedLayer] = useState<'lst' | 'ndvi' | 'heatIndex'>('lst')
   const [loading, setLoading] = useState(true)
   const [selectedCity, setSelectedCity] = useState('Jaipur')
-  const [heatmapData, setHeatmapData] = useState<any>(null)
   const [isMounted, setIsMounted] = useState(false)
   const [selectedTime, setSelectedTime] = useState('current')
 
@@ -33,9 +45,8 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
     try {
       setLoading(true)
       const response = await analyticsAPI.getHeatmap(selectedCity)
-      setHeatmapData(response.data)
 
-      const transformedData: HeatDataPoint[] = response.data.hotspots.map((hotspot: any, index: number) => ({
+      const transformedData: HeatDataPoint[] = response.data.hotspots.map((hotspot: HotspotData, index: number) => ({
         id: index,
         lat: hotspot.lat,
         lng: hotspot.lng,
@@ -63,7 +74,7 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
     } finally {
       setLoading(false)
     }
-  }, [selectedCity, selectedTime])
+  }, [selectedCity])
 
   useEffect(() => {
     if (isMounted) {
@@ -196,14 +207,16 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
 
       <div className={`rounded-xl overflow-hidden border border-white/10 ${fullScreen ? 'h-[calc(100vh-200px)]' : 'h-[600px]'}`}>
         {isMounted && (
-          <LeafletMap
-            center={getCityCenter(selectedCity)}
-            heatData={heatData}
-            selectedLayer={selectedLayer}
-            getColor={getColor}
-            getRadius={getRadius}
-            fullScreen={fullScreen}
-          />
+          <MapErrorBoundary>
+            <GISMap
+              center={getCityCenter(selectedCity)}
+              heatData={heatData}
+              selectedLayer={selectedLayer}
+              getColor={getColor}
+              getRadius={getRadius}
+              fullScreen={fullScreen}
+            />
+          </MapErrorBoundary>
         )}
       </div>
 
@@ -224,7 +237,7 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
   )
 }
 
-function LegendItem({ color, label }: any) {
+function LegendItem({ color, label }: LegendItemProps) {
   return (
     <div className="flex items-center space-x-2">
       <div className="w-4 h-4 rounded" style={{ backgroundColor: color }}></div>

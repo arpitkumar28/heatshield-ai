@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Map, Layers, Navigation, ZoomIn, ZoomOut, Maximize2, Compass, Satellite, Gauge, Wind, Droplets, Users, Thermometer, Building, GraduationCap } from 'lucide-react'
+import { Map, Layers, ZoomIn, ZoomOut, Maximize2, Compass, Satellite, Wind, Droplets, Users, Thermometer, Building, GraduationCap } from 'lucide-react'
 import { PremiumCard } from '@/components/ui/premium'
 import { useState } from 'react'
 

@@ -13,20 +13,20 @@ interface HeatDataPoint {
   timestamp: string
 }
 
-interface LeafletMapProps {
+interface GISMapProps {
   center: [number, number]
   heatData: HeatDataPoint[]
   selectedLayer: 'lst' | 'ndvi' | 'heatIndex'
   getColor: (value: number, layer: string) => string
   getRadius: (value: number) => number
   fullScreen?: boolean
+  onLocationClick?: (point: HeatDataPoint) => void
 }
 
-// Directly dynamic-import the Client component with SSR disabled
-// This handles the 'window is not defined' and mounting logic automatically
-const LeafletMap = dynamic(
-  () => import('./LeafletMapClient'),
-  { 
+// Dynamic import with SSR disabled to prevent hydration issues
+const GISMapClient = dynamic(
+  () => import('./GISMapClient'),
+  {
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center h-full bg-white/5 rounded-lg">
@@ -36,4 +36,6 @@ const LeafletMap = dynamic(
   }
 )
 
-export default LeafletMap
+export default function GISMap(props: GISMapProps) {
+  return <GISMapClient {...props} />
+}

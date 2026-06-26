@@ -1,12 +1,12 @@
 'use client'
 
-import { Thermometer, Activity, MapPin, Users, AlertTriangle, Building2, TrendingUp, LucideIcon } from 'lucide-react'
+import { Thermometer, Activity, MapPin, Users, AlertTriangle, Building2, TrendingUp } from 'lucide-react'
 
 interface MetricCardProps {
   title: string
   value: string
   change: string
-  icon: any
+  icon: React.ComponentType<{ className?: string }>
   color: 'danger' | 'warning' | 'success' | 'primary'
 }
 

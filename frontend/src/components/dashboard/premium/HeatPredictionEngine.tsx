@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Brain, TrendingUp, Calendar, MapPin, Settings, Play, Download, BarChart3, AlertCircle, CheckCircle, Clock, Thermometer } from 'lucide-react'
+import { Brain, TrendingUp, MapPin, Settings, Play, Download, BarChart3, AlertCircle, CheckCircle, Clock, Thermometer } from 'lucide-react'
 import { EnterpriseCard } from '@/components/ui/premium'
 
 interface PredictionModel {

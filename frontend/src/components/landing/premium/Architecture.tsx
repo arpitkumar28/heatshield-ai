@@ -24,30 +24,54 @@ const architectureLayers = [
     title: 'AI Layer',
     description: 'Advanced machine learning models for prediction, anomaly detection, and recommendation generation.',
     components: ['Deep Learning', 'Time Series', 'Computer Vision', 'NLP'],
-    color: 'heat-orange',
+    color: 'orange',
   },
   {
     icon: Cloud,
     title: 'Storage Layer',
     description: 'Scalable cloud infrastructure with data lakes, warehouses, and real-time databases.',
     components: ['Data Lakes', 'Time-Series DB', 'Vector Store', 'Cache Layer'],
-    color: 'heat-blue',
+    color: 'blue',
   },
   {
     icon: Shield,
     title: 'Security Layer',
     description: 'Enterprise-grade security with encryption, access control, and compliance certifications.',
     components: ['End-to-End Encryption', 'RBAC', 'Audit Logs', 'Compliance'],
-    color: 'heat-green',
+    color: 'success',
   },
   {
     icon: Zap,
     title: 'API Layer',
     description: 'RESTful and GraphQL APIs for seamless integration with government systems and third-party applications.',
     components: ['REST API', 'GraphQL', 'Webhooks', 'SDKs'],
-    color: 'heat-yellow',
+    color: 'warning',
   },
 ]
+
+const getLayerColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    primary: 'bg-primary/10 border-primary/30',
+    secondary: 'bg-secondary/10 border-secondary/30',
+    orange: 'bg-orange/10 border-orange/30',
+    blue: 'bg-blue/10 border-blue/30',
+    success: 'bg-success/10 border-success/30',
+    warning: 'bg-warning/10 border-warning/30',
+  }
+  return colorMap[color] || 'bg-primary/10 border-primary/30'
+}
+
+const getLayerTextColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    primary: 'text-primary',
+    secondary: 'text-secondary',
+    orange: 'text-orange',
+    blue: 'text-blue',
+    success: 'text-success',
+    warning: 'text-warning',
+  }
+  return colorMap[color] || 'text-primary'
+}
 
 export default function PremiumArchitecture() {
   return (
@@ -108,8 +132,8 @@ export default function PremiumArchitecture() {
                     className="flex items-start gap-6"
                   >
                     {/* Layer icon */}
-                    <div className={`w-12 h-12 rounded-xl bg-${layer.color}/10 border border-${layer.color}/30 flex items-center justify-center flex-shrink-0`}>
-                      <layer.icon className={`w-6 h-6 text-${layer.color}`} />
+                    <div className={`w-12 h-12 rounded-xl border flex items-center justify-center flex-shrink-0 ${getLayerColorClass(layer.color)}`}>
+                      <layer.icon className={`w-6 h-6 ${getLayerTextColorClass(layer.color)}`} />
                     </div>
 
                     {/* Layer content */}
@@ -182,13 +206,13 @@ export default function PremiumArchitecture() {
 
             <PremiumCard variant="glass" padding="lg">
               <div className="flex items-center gap-3 mb-4">
-                <Lock className="w-6 h-6 text-heat-green" />
+                <Lock className="w-6 h-6 text-success" />
                 <h4 className="font-display text-lg font-bold text-white">Security Stack</h4>
               </div>
               <div className="space-y-2">
                 {['AES-256 Encryption', 'OAuth 2.0', 'SOC 2 Type II', 'ISO 27001'].map((item) => (
                   <div key={item} className="flex items-center gap-2 text-sm text-text-muted">
-                    <div className="w-1.5 h-1.5 rounded-full bg-heat-green" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-success" />
                     <span>{item}</span>
                   </div>
                 ))}

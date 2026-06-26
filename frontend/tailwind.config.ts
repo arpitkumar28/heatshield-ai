@@ -294,6 +294,9 @@ const config: Config = {
         'badge': '20px',
         'dialog': '24px',
         'panel': '16px',
+        'xl': '24px',
+        '2xl': '32px',
+        '3xl': '48px',
       },
       spacing: {
         '18': '4.5rem',

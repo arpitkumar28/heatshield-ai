@@ -9,7 +9,7 @@ interface APIEndpoint {
   path: string
   description: string
   parameters?: Array<{ name: string; type: string; required: boolean; description: string }>
-  response?: any
+  response?: Record<string, unknown>
   example?: string
 }
 
@@ -219,14 +219,12 @@ Content-Type: application/json
   "email": "user@agency.gov.in",
   "password": "secure_password"
 }`}
-                  language="json"
                 />
                 <CodeBlock
                   title="Use Token"
                   code={`GET /api/v1/heatmap
 Authorization: Bearer <your_jwt_token>
 Content-Type: application/json`}
-                  language="bash"
                 />
               </div>
             </div>
@@ -237,7 +235,6 @@ Content-Type: application/json`}
               <CodeBlock
                 code={`POST /api/v1/auth/refresh
 Authorization: Bearer <refresh_token>`}
-                language="bash"
               />
             </div>
           </div>
@@ -259,7 +256,6 @@ response = requests.get(
 
 data = response.json()
 print(f"Hotspots found: {len(data['hotspots'])}")`}
-                language="python"
               />
             </div>
 
@@ -284,7 +280,6 @@ const response = await fetch(
 
 const data = await response.json();
 console.log('Predictions:', data.predictions);`}
-                language="javascript"
               />
             </div>
           </div>
@@ -294,7 +289,14 @@ console.log('Predictions:', data.predictions);`}
   )
 }
 
-function TabButton({ icon, label, active, onClick }: any) {
+interface TabButtonProps {
+  icon: React.ReactNode
+  label: string
+  active: boolean
+  onClick: () => void
+}
+
+function TabButton({ icon, label, active, onClick }: TabButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -310,7 +312,14 @@ function TabButton({ icon, label, active, onClick }: any) {
   )
 }
 
-function InfoCard({ icon, title, value, description }: any) {
+interface InfoCardProps {
+  icon: React.ReactNode
+  title: string
+  value: string
+  description: string
+}
+
+function InfoCard({ icon, title, value, description }: InfoCardProps) {
   return (
     <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl p-4 border border-white/10">
       <div className="flex items-center gap-2 mb-2">
@@ -323,7 +332,13 @@ function InfoCard({ icon, title, value, description }: any) {
   )
 }
 
-function Step({ number, title, description }: any) {
+interface StepProps {
+  number: number
+  title: string
+  description: string
+}
+
+function Step({ number, title, description }: StepProps) {
   return (
     <div className="flex items-start gap-4">
       <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
@@ -337,7 +352,14 @@ function Step({ number, title, description }: any) {
   )
 }
 
-function EndpointCard({ endpoint, methodColors, onCopy, copied }: any) {
+interface EndpointCardProps {
+  endpoint: APIEndpoint
+  methodColors: Record<string, string>
+  onCopy: (path: string) => void
+  copied: boolean
+}
+
+function EndpointCard({ endpoint, methodColors, onCopy, copied }: EndpointCardProps) {
   const [expanded, setExpanded] = useState(false)
 
   return (
@@ -373,7 +395,7 @@ function EndpointCard({ endpoint, methodColors, onCopy, copied }: any) {
             <div>
               <h5 className="text-sm font-semibold text-white mb-2">Parameters</h5>
               <div className="space-y-2">
-                {endpoint.parameters.map((param: any, i: number) => (
+                {endpoint.parameters.map((param: { name: string; type: string; required: boolean; description: string }, i: number) => (
                   <div key={i} className="flex items-center gap-3 text-sm">
                     <code className="text-primary">{param.name}</code>
                     <span className="text-text-muted">{param.type}</span>
@@ -388,7 +410,7 @@ function EndpointCard({ endpoint, methodColors, onCopy, copied }: any) {
           {endpoint.response && (
             <div>
               <h5 className="text-sm font-semibold text-white mb-2">Response</h5>
-              <CodeBlock code={JSON.stringify(endpoint.response, null, 2)} language="json" />
+              <CodeBlock code={JSON.stringify(endpoint.response, null, 2)} />
             </div>
           )}
         </div>
@@ -397,7 +419,12 @@ function EndpointCard({ endpoint, methodColors, onCopy, copied }: any) {
   )
 }
 
-function CodeBlock({ title, code, language }: any) {
+interface CodeBlockProps {
+  title?: string
+  code: string
+}
+
+function CodeBlock({ title, code }: CodeBlockProps) {
   return (
     <div className="bg-black/30 rounded-lg p-4 border border-white/10">
       {title && <p className="text-xs text-text-muted mb-2">{title}</p>}

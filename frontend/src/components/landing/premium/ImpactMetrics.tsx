@@ -20,7 +20,7 @@ const impactMetrics = [
     change: '+320',
     unit: 'hectares',
     description: 'Urban green spaces created through AI-recommended interventions',
-    color: 'heat-green',
+    color: 'success',
   },
   {
     icon: Droplets,
@@ -29,7 +29,7 @@ const impactMetrics = [
     change: '+2.1B',
     unit: 'liters',
     description: 'Water conservation through smart cooling and irrigation systems',
-    color: 'heat-blue',
+    color: 'blue',
   },
   {
     icon: Zap,
@@ -38,7 +38,7 @@ const impactMetrics = [
     change: '+120',
     unit: 'GWh',
     description: 'Energy savings through cool roofs and efficient infrastructure',
-    color: 'heat-yellow',
+    color: 'warning',
   },
   {
     icon: Shield,
@@ -46,7 +46,7 @@ const impactMetrics = [
     value: '47',
     change: '+12',
     description: 'Major heat-related disasters averted through early intervention',
-    color: 'heat-red',
+    color: 'danger',
   },
   {
     icon: Award,
@@ -54,7 +54,7 @@ const impactMetrics = [
     value: '12',
     change: '+4',
     description: 'National and international awards for climate innovation',
-    color: 'heat-orange',
+    color: 'orange',
   },
 ]
 
@@ -78,6 +78,30 @@ const successStories = [
     metrics: ['45% faster response', '89% citizen satisfaction', '24/7 monitoring'],
   },
 ]
+
+const getMetricColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    primary: 'bg-primary/10 border-primary/30',
+    success: 'bg-success/10 border-success/30',
+    blue: 'bg-blue/10 border-blue/30',
+    warning: 'bg-warning/10 border-warning/30',
+    danger: 'bg-danger/10 border-danger/30',
+    orange: 'bg-orange/10 border-orange/30',
+  }
+  return colorMap[color] || 'bg-primary/10 border-primary/30'
+}
+
+const getMetricTextColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    primary: 'text-primary',
+    success: 'text-success',
+    blue: 'text-blue',
+    warning: 'text-warning',
+    danger: 'text-danger',
+    orange: 'text-orange',
+  }
+  return colorMap[color] || 'text-primary'
+}
 
 export default function PremiumImpactMetrics() {
   return (
@@ -133,9 +157,9 @@ export default function PremiumImpactMetrics() {
                   whileInView={{ scale: 1, rotate: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 + 0.2 }}
-                  className={`w-16 h-16 rounded-2xl bg-${metric.color}/10 border border-${metric.color}/30 flex items-center justify-center mx-auto mb-6`}
+                  className={`w-16 h-16 rounded-2xl border flex items-center justify-center mx-auto mb-6 ${getMetricColorClass(metric.color)}`}
                 >
-                  <metric.icon className={`w-8 h-8 text-${metric.color}`} />
+                  <metric.icon className={`w-8 h-8 ${getMetricTextColorClass(metric.color)}`} />
                 </motion.div>
 
                 {/* Value */}
@@ -208,7 +232,7 @@ export default function PremiumImpactMetrics() {
                   <div className="space-y-2 pt-4 border-t border-white/10">
                     {story.metrics.map((metric) => (
                       <div key={metric} className="flex items-center gap-2 text-sm text-text-muted">
-                        <div className="w-1.5 h-1.5 rounded-full bg-success" />
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                         <span>{metric}</span>
                       </div>
                     ))}

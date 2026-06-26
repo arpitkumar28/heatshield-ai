@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Smartphone, Download, QrCode, Link2, Users, Activity, AlertTriangle, MapPin, Thermometer, Bell, CheckCircle, XCircle, Clock, BarChart3 } from 'lucide-react'
+import { Smartphone, Download, QrCode, Users, Activity, AlertTriangle, MapPin, Thermometer, Bell, CheckCircle, XCircle, Clock, BarChart3 } from 'lucide-react'
 import { EnterpriseCard } from '@/components/ui/premium'
 
 export default function MobileIntegration() {
@@ -285,7 +285,14 @@ export default function MobileIntegration() {
   )
 }
 
-function TabButton({ icon, label, active, onClick }: any) {
+interface TabButtonProps {
+  icon: React.ReactNode
+  label: string
+  active: boolean
+  onClick: () => void
+}
+
+function TabButton({ icon, label, active, onClick }: TabButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -301,7 +308,14 @@ function TabButton({ icon, label, active, onClick }: any) {
   )
 }
 
-function StatCard({ title, value, icon, change }: any) {
+interface StatCardProps {
+  title: string
+  value: string
+  icon: React.ReactNode
+  change: string
+}
+
+function StatCard({ title, value, icon, change }: StatCardProps) {
   return (
     <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl p-4 border border-white/10">
       <div className="flex items-center gap-2 mb-2">
@@ -314,7 +328,16 @@ function StatCard({ title, value, icon, change }: any) {
   )
 }
 
-function ActivityItem({ activity }: any) {
+interface ActivityItemProps {
+  activity: {
+    user: string
+    action: string
+    location: string
+    time: string
+  }
+}
+
+function ActivityItem({ activity }: ActivityItemProps) {
   return (
     <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
       <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">
@@ -332,7 +355,15 @@ function ActivityItem({ activity }: any) {
   )
 }
 
-function AnalyticsCard({ title, metric, value, trend, data }: any) {
+interface AnalyticsCardProps {
+  title: string
+  metric: string
+  value: string
+  trend: string
+  data: number[]
+}
+
+function AnalyticsCard({ title, metric, value, trend, data }: AnalyticsCardProps) {
   return (
     <div className="bg-gradient-to-br from-white/5 to-white/[0.02] rounded-xl p-4 border border-white/10">
       <h4 className="text-sm font-semibold text-white mb-3">{title}</h4>
@@ -356,7 +387,14 @@ function AnalyticsCard({ title, metric, value, trend, data }: any) {
   )
 }
 
-function FeatureUsage({ icon, feature, usage, percentage }: any) {
+interface FeatureUsageProps {
+  icon: React.ReactNode
+  feature: string
+  usage: string
+  percentage: string
+}
+
+function FeatureUsage({ icon, feature, usage, percentage }: FeatureUsageProps) {
   return (
     <div className="flex items-center gap-4">
       <div className="p-2 rounded-lg bg-white/10">{icon}</div>

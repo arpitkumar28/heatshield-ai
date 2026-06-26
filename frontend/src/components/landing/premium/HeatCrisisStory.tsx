@@ -11,28 +11,28 @@ const crisisStages = [
     title: 'Rising Temperatures',
     description: 'Urban heat islands are intensifying, with cities experiencing temperatures 5-8°C higher than surrounding areas.',
     stats: { value: '45°C', label: 'Peak Temperature', change: '+2.5°C' },
-    color: 'heat-yellow',
+    color: 'warning',
   },
   {
     icon: Flame,
     title: 'Heat Crisis Escalation',
     description: 'Heat waves are becoming more frequent and severe, threatening vulnerable populations and infrastructure.',
     stats: { value: '234', label: 'Heat Wave Days', change: '+45%' },
-    color: 'heat-orange',
+    color: 'orange',
   },
   {
     icon: AlertTriangle,
     title: 'Public Health Emergency',
     description: 'Heat-related illnesses surge, overwhelming healthcare systems and increasing mortality rates.',
     stats: { value: '2,400+', label: 'Annual Deaths', change: '+18%' },
-    color: 'heat-red',
+    color: 'danger',
   },
   {
     icon: Users,
     title: 'Vulnerable Communities',
     description: 'Low-income neighborhoods, elderly populations, and outdoor workers face disproportionate risks.',
     stats: { value: '120M', label: 'At-Risk Population', change: '+15%' },
-    color: 'heat-dark-red',
+    color: 'red-800',
   },
   {
     icon: Building2,
@@ -46,9 +46,31 @@ const crisisStages = [
     title: 'Water Crisis',
     description: 'Depleting water tables and increased evaporation exacerbate drought conditions.',
     stats: { value: '45%', label: 'Water Table Drop', change: '-12%' },
-    color: 'heat-blue',
+    color: 'blue',
   },
 ]
+
+const getStageColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    warning: 'bg-warning/10 border-warning/30',
+    orange: 'bg-orange/10 border-orange/30',
+    danger: 'bg-danger/10 border-danger/30',
+    'red-800': 'bg-red-800/10 border-red-800/30',
+    blue: 'bg-blue/10 border-blue/30',
+  }
+  return colorMap[color] || 'bg-primary/10 border-primary/30'
+}
+
+const getStageTextColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    warning: 'text-warning',
+    orange: 'text-orange',
+    danger: 'text-danger',
+    'red-800': 'text-red-800',
+    blue: 'text-blue',
+  }
+  return colorMap[color] || 'text-primary'
+}
 
 export default function PremiumHeatCrisisStory() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -120,8 +142,8 @@ export default function PremiumHeatCrisisStory() {
                 >
                   <PremiumCard variant="glass" padding="lg" className="h-full">
                     <div className="flex items-start gap-4 mb-6">
-                      <div className={`p-3 rounded-xl bg-${stage.color}/10 border border-${stage.color}/30`}>
-                        <stage.icon className={`w-8 h-8 text-${stage.color}`} />
+                      <div className={`p-3 rounded-xl border ${getStageColorClass(stage.color)}`}>
+                        <stage.icon className={`w-8 h-8 ${getStageTextColorClass(stage.color)}`} />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-display text-2xl font-bold text-white mb-2">
@@ -160,7 +182,7 @@ export default function PremiumHeatCrisisStory() {
                 >
                   <div className="glass-premium rounded-premium p-8 border border-white/10">
                     {/* Animated visualization */}
-                    <div className="relative h-64 rounded-card bg-gradient-to-br from-background-dark to-background overflow-hidden">
+                    <div className="relative min-h-[300px] rounded-card bg-gradient-to-br from-background-dark to-background overflow-hidden">
                       {/* Background grid */}
                       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
                       
@@ -170,14 +192,14 @@ export default function PremiumHeatCrisisStory() {
                           <motion.div
                             animate={{ scale: [1, 1.3, 1] }}
                             transition={{ duration: 4, repeat: Infinity }}
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-heat-yellow/30 blur-xl"
+                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-warning/30 blur-xl"
                           />
                           <motion.div
                             animate={{ y: [0, -20, 0] }}
                             transition={{ duration: 3, repeat: Infinity }}
                             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                           >
-                            <Thermometer className="w-16 h-16 text-heat-yellow" />
+                            <Thermometer className="w-16 h-16 text-warning" />
                           </motion.div>
                         </>
                       )}
@@ -196,7 +218,7 @@ export default function PremiumHeatCrisisStory() {
                                 repeat: Infinity,
                                 delay: i * 0.2,
                               }}
-                              className="absolute w-8 h-8 rounded-full bg-heat-orange/50 blur-sm"
+                              className="absolute w-8 h-8 rounded-full bg-orange/50 blur-sm"
                               style={{
                                 left: `${20 + i * 15}%`,
                                 top: `${30 + (i % 2) * 30}%`,
@@ -208,7 +230,7 @@ export default function PremiumHeatCrisisStory() {
                             transition={{ duration: 10, repeat: Infinity }}
                             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                           >
-                            <Flame className="w-20 h-20 text-heat-orange" />
+                            <Flame className="w-20 h-20 text-orange" />
                           </motion.div>
                         </>
                       )}
@@ -218,7 +240,7 @@ export default function PremiumHeatCrisisStory() {
                           <motion.div
                             animate={{ scale: [1, 1.2, 1] }}
                             transition={{ duration: 1, repeat: Infinity }}
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-heat-red/20 blur-2xl"
+                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-danger/20 blur-2xl"
                           />
                           <motion.div
                             animate={{ 
@@ -227,7 +249,7 @@ export default function PremiumHeatCrisisStory() {
                             transition={{ duration: 0.5, repeat: Infinity }}
                             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                           >
-                            <AlertTriangle className="w-24 h-24 text-heat-red" />
+                            <AlertTriangle className="w-24 h-24 text-danger" />
                           </motion.div>
                         </>
                       )}
@@ -246,7 +268,7 @@ export default function PremiumHeatCrisisStory() {
                                 repeat: Infinity,
                                 delay: Math.random(),
                               }}
-                              className="absolute w-4 h-4 rounded-full bg-heat-dark-red/60"
+                              className="absolute w-4 h-4 rounded-full bg-red-800/60"
                               style={{
                                 left: `${10 + Math.random() * 80}%`,
                                 top: `${10 + Math.random() * 80}%`,
@@ -258,7 +280,7 @@ export default function PremiumHeatCrisisStory() {
                             transition={{ duration: 2, repeat: Infinity }}
                             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                           >
-                            <Users className="w-20 h-20 text-heat-dark-red" />
+                            <Users className="w-20 h-20 text-red-800" />
                           </motion.div>
                         </>
                       )}
@@ -296,7 +318,7 @@ export default function PremiumHeatCrisisStory() {
                                 repeat: Infinity,
                                 delay: i * 0.3,
                               }}
-                              className="absolute w-1 h-16 bg-gradient-to-t from-transparent to-heat-blue/60 rounded-full"
+                              className="absolute w-1 h-16 bg-gradient-to-t from-transparent to-blue/60 rounded-full"
                               style={{
                                 left: `${15 + i * 14}%`,
                                 bottom: '20%',
@@ -308,7 +330,7 @@ export default function PremiumHeatCrisisStory() {
                             transition={{ duration: 3, repeat: Infinity }}
                             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                           >
-                            <Droplets className="w-20 h-20 text-heat-blue" />
+                            <Droplets className="w-20 h-20 text-blue" />
                           </motion.div>
                         </>
                       )}

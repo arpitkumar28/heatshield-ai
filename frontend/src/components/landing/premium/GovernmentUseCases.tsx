@@ -17,7 +17,7 @@ const useCases = [
     title: 'NDMA',
     description: 'National Disaster Management Authority uses the platform for heat wave disaster preparedness.',
     benefits: ['Early warning systems', 'Evacuation planning', 'Resource allocation', 'Inter-agency coordination'],
-    color: 'heat-red',
+    color: 'danger',
   },
   {
     icon: Users,
@@ -31,23 +31,47 @@ const useCases = [
     title: 'State Governments',
     description: 'State-level monitoring and management of heat-related emergencies across districts.',
     benefits: ['District-level tracking', 'State-wide coordination', 'Resource management', 'Policy support'],
-    color: 'heat-orange',
+    color: 'orange',
   },
   {
     icon: TreePine,
     title: 'Municipal Corporations',
     description: 'City-level implementation of heat mitigation strategies and citizen services.',
     benefits: ['Local hotspot management', 'Cooling center operations', 'Citizen alerts', 'Infrastructure maintenance'],
-    color: 'heat-green',
+    color: 'success',
   },
   {
     icon: AlertTriangle,
     title: 'Health Departments',
     description: 'Public health monitoring and heat-related illness prevention programs.',
     benefits: ['Health impact tracking', 'Hospital readiness', 'Public advisories', 'Emergency response'],
-    color: 'heat-yellow',
+    color: 'warning',
   },
 ]
+
+const getUseCaseColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    primary: 'bg-primary/10 border-primary/30',
+    danger: 'bg-danger/10 border-danger/30',
+    secondary: 'bg-secondary/10 border-secondary/30',
+    orange: 'bg-orange/10 border-orange/30',
+    success: 'bg-success/10 border-success/30',
+    warning: 'bg-warning/10 border-warning/30',
+  }
+  return colorMap[color] || 'bg-primary/10 border-primary/30'
+}
+
+const getUseCaseTextColorClass = (color: string) => {
+  const colorMap: Record<string, string> = {
+    primary: 'text-primary',
+    danger: 'text-danger',
+    secondary: 'text-secondary',
+    orange: 'text-orange',
+    success: 'text-success',
+    warning: 'text-warning',
+  }
+  return colorMap[color] || 'text-primary'
+}
 
 export default function PremiumGovernmentUseCases() {
   return (
@@ -106,9 +130,9 @@ export default function PremiumGovernmentUseCases() {
                   whileInView={{ scale: 1, rotate: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6, delay: index * 0.1 + 0.2 }}
-                  className={`w-16 h-16 rounded-2xl bg-${useCase.color}/10 border border-${useCase.color}/30 flex items-center justify-center mb-6`}
+                  className={`w-16 h-16 rounded-2xl border flex items-center justify-center mb-6 ${getUseCaseColorClass(useCase.color)}`}
                 >
-                  <useCase.icon className={`w-8 h-8 text-${useCase.color}`} />
+                  <useCase.icon className={`w-8 h-8 ${getUseCaseTextColorClass(useCase.color)}`} />
                 </motion.div>
 
                 {/* Content */}
