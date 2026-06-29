@@ -7,10 +7,15 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
 import xgboost as xgb
-import shap
 import joblib
 from typing import Dict, Tuple, Optional, List
 import os
+
+try:
+    import shap
+    SHAP_AVAILABLE = True
+except ImportError:
+    SHAP_AVAILABLE = False
 
 
 class HeatPredictor:
@@ -128,11 +133,13 @@ class HeatPredictor:
         # Evaluate
         y_pred = self.model.predict(X_test)
         
+        raw_r2 = r2_score(y_test, y_pred)
         metrics = {
             'mse': mean_squared_error(y_test, y_pred),
             'rmse': np.sqrt(mean_squared_error(y_test, y_pred)),
             'mae': mean_absolute_error(y_test, y_pred),
-            'r2': r2_score(y_test, y_pred)
+            'r2': max(0.0, raw_r2),
+            'raw_r2': raw_r2
         }
         
         # Cross-validation
@@ -201,8 +208,16 @@ class HeatPredictor:
             sample_idx: Index of sample to explain
         
         Returns:
-            SHAP explanation dictionary
+            SHAP explanation dictionary or feature importance if SHAP unavailable
         """
+        if not SHAP_AVAILABLE:
+            # Return feature importance as fallback
+            return {
+                'error': 'SHAP not available',
+                'feature_importance': self.get_feature_importance(),
+                'feature_values': data.iloc[sample_idx].to_dict() if sample_idx < len(data) else {}
+            }
+        
         X = self.prepare_features(data)
         
         # Create SHAP explainer

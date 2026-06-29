@@ -10,7 +10,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -23,6 +23,7 @@ MANIFEST
 venv/
 env/
 ENV/
+.venv/
 
 # Node
 node_modules/
@@ -81,6 +82,7 @@ models/*.joblib
 # Testing
 .pytest_cache/
 .coverage
+coverage.xml
 htmlcov/
 
 # OS

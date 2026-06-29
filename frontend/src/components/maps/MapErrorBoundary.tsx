@@ -15,6 +15,12 @@ interface State {
   retryCount: number
 }
 
+interface MonitoringWindow extends Window {
+  Sentry?: {
+    captureException: (error: Error, context?: unknown) => void
+  }
+}
+
 export class MapErrorBoundary extends Component<Props, State> {
   private maxRetries = 3
   private retryTimeout: NodeJS.Timeout | null = null
@@ -28,7 +34,7 @@ export class MapErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error }
+    return { hasError: true, error, retryCount: 0 }
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -36,8 +42,9 @@ export class MapErrorBoundary extends Component<Props, State> {
     this.setState({ errorInfo })
     
     // Log to external monitoring service in production
-    if (typeof window !== 'undefined' && (window as any).Sentry) {
-      (window as any).Sentry.captureException(error, {
+    const monitoringWindow = typeof window !== 'undefined' ? (window as MonitoringWindow) : undefined
+    if (monitoringWindow?.Sentry) {
+      monitoringWindow.Sentry.captureException(error, {
         contexts: {
           react: {
             componentStack: errorInfo.componentStack

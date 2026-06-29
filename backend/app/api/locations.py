@@ -16,33 +16,12 @@ def create_location(location: LocationCreate, db: Session = Depends(get_db), cur
     return heat_service.create_location(location.model_dump())
 
 
-@router.get("/{location_id}", response_model=LocationSchema)
-def get_location(location_id: int, db: Session = Depends(get_db)):
-    heat_service = HeatService(db)
-    location = heat_service.get_location_by_id(location_id)
-    if not location:
-        raise HTTPException(status_code=404, detail="Location not found")
-    return location
-
-
 @router.get("/", response_model=List[LocationSchema])
 def get_locations(location_type: Optional[str] = None, db: Session = Depends(get_db)):
     heat_service = HeatService(db)
     if location_type:
         return heat_service.get_locations_by_type(location_type)
     return heat_service.db.query(LocationModel).all()
-
-
-@router.post("/heat-data", response_model=HeatDataSchema)
-def create_heat_data(heat_data: HeatDataCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
-    heat_service = HeatService(db)
-    return heat_service.create_heat_data(heat_data)
-
-
-@router.get("/{location_id}/heat-data", response_model=List[HeatDataSchema])
-def get_heat_data(location_id: int, limit: int = Query(100, ge=1, le=1000), db: Session = Depends(get_db)):
-    heat_service = HeatService(db)
-    return heat_service.get_heat_data_by_location(location_id, limit)
 
 
 @router.get("/hotspots")
@@ -74,6 +53,18 @@ def get_hotspots(threshold: float = Query(0.7, ge=0, le=1), db: Session = Depend
     return {"hotspots": formatted_hotspots}
 
 
+@router.post("/heat-data", response_model=HeatDataSchema)
+def create_heat_data(heat_data: HeatDataCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
+    heat_service = HeatService(db)
+    return heat_service.create_heat_data(heat_data)
+
+
+@router.get("/{location_id}/heat-data", response_model=List[HeatDataSchema])
+def get_heat_data(location_id: int, limit: int = Query(100, ge=1, le=1000), db: Session = Depends(get_db)):
+    heat_service = HeatService(db)
+    return heat_service.get_heat_data_by_location(location_id, limit)
+
+
 @router.post("/cooling-centers", response_model=CoolingCenterSchema)
 def create_cooling_center(center: CoolingCenterCreate, db: Session = Depends(get_db), current_user: dict = Depends(get_current_user)):
     heat_service = HeatService(db)
@@ -89,3 +80,12 @@ def get_nearby_cooling_centers(
 ):
     heat_service = HeatService(db)
     return heat_service.get_nearby_cooling_centers(latitude, longitude, radius_km)
+
+
+@router.get("/{location_id}", response_model=LocationSchema)
+def get_location(location_id: int, db: Session = Depends(get_db)):
+    heat_service = HeatService(db)
+    location = heat_service.get_location_by_id(location_id)
+    if not location:
+        raise HTTPException(status_code=404, detail="Location not found")
+    return location

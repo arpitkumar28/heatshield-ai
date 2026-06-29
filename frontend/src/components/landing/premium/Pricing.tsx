@@ -73,7 +73,7 @@ export default function Pricing() {
       <div className="absolute inset-0 bg-gradient-to-b from-background via-surface to-background" />
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,200,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,200,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px]" />
 
-      <div className="relative z-10 container mx-auto px-6">
+      <div className="relative z-10 w-full max-w-full mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

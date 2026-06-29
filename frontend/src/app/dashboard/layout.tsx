@@ -16,6 +16,7 @@ export default function DashboardLayout({
       <EnterpriseSidebar
         collapsed={sidebarCollapsed}
         onCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        className="fixed inset-y-0 left-0 z-40 h-screen"
       />
       
       <div className={`transition-all duration-300 ${
@@ -25,9 +26,10 @@ export default function DashboardLayout({
           onMenuClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           onThemeToggle={() => setIsDarkMode(!isDarkMode)}
           isDarkMode={isDarkMode}
+          className="sticky top-0 z-30"
         />
         
-        <main className="p-6">
+        <main className="min-h-[calc(100vh-4rem)] p-6">
           {children}
         </main>
       </div>

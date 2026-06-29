@@ -84,7 +84,7 @@ def get_all_recommendations(db: Session = Depends(get_db)):
         return {"recommendations": [], "error": str(e)}
 
 
-@router.post("/recommendations", response_model=RecommendationSchema)
+@router.post("/", response_model=RecommendationSchema)
 def create_recommendation(rec: RecommendationCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     rec_service = RecommendationService(db)
     return rec_service.create_recommendation(rec)
@@ -96,13 +96,13 @@ def get_recommendations(location_id: int, db: Session = Depends(get_db)):
     return rec_service.get_recommendations_by_location(location_id)
 
 
-@router.get("/recommendations/category/{category}", response_model=List[RecommendationSchema])
+@router.get("/category/{category}", response_model=List[RecommendationSchema])
 def get_recommendations_by_category(category: str, db: Session = Depends(get_db)):
     rec_service = RecommendationService(db)
     return rec_service.get_recommendations_by_category(category)
 
 
-@router.put("/recommendations/{rec_id}/status")
+@router.put("/{rec_id}/status")
 def update_recommendation_status(rec_id: int, status: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     rec_service = RecommendationService(db)
     rec = rec_service.update_recommendation_status(rec_id, status)

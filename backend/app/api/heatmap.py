@@ -1,14 +1,21 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.core.database import get_db
 from app.models.location import HeatData, Location
+from app.core.redis import cache_response
 
 router = APIRouter()
 
 
 @router.get("/")
-def get_heatmap(city: str = Query("Jaipur"), db: Session = Depends(get_db)):
-    """Get heatmap data for a specific city"""
+@cache_response(key_prefix="heatmap", expire=300) # Cache for 5 minutes (Production Optimization)
+async def get_heatmap(city: str = Query("Jaipur"), db: Session = Depends(get_db)):
+    """
+    Get heatmap data for a specific city.
+    Optimized to use SQL aggregations instead of Python loops.
+    Caches results in Redis to reduce DB load.
+    """
     location = db.query(Location).filter(Location.name == city).first()
     
     if not location:
@@ -22,17 +29,18 @@ def get_heatmap(city: str = Query("Jaipur"), db: Session = Depends(get_db)):
             "hotspots": []
         }
     
-    # Get latest heat data for this location
+    # Use SQL aggregation for average temperature (Performance Optimization)
+    avg_temp_query = db.query(func.avg(HeatData.land_surface_temperature))\
+        .filter(HeatData.location_id == location.id).scalar()
+    
+    avg_temp = avg_temp_query if avg_temp_query else 0
+    
+    # Get latest heat data for hotspots
     heat_data_list = db.query(HeatData)\
         .filter(HeatData.location_id == location.id)\
         .order_by(HeatData.timestamp.desc())\
-        .limit(50)\
+        .limit(100)\
         .all()
-    
-    # Calculate average temperature
-    avg_temp = 0
-    if heat_data_list:
-        avg_temp = sum(hd.land_surface_temperature for hd in heat_data_list) / len(heat_data_list)
     
     # Get hotspots
     hotspots = []
@@ -40,7 +48,7 @@ def get_heatmap(city: str = Query("Jaipur"), db: Session = Depends(get_db)):
         if hd.is_hotspot:
             risk_level = "High" if hd.land_surface_temperature > 42 else "Medium" if hd.land_surface_temperature > 35 else "Low"
             hotspots.append({
-                "lat": location.latitude + (hash(str(hd.id)) % 100) / 10000,  # Add slight variation
+                "lat": location.latitude + (hash(str(hd.id)) % 100) / 10000, 
                 "lng": location.longitude + (hash(str(hd.id)) % 100) / 10000,
                 "temperature": hd.land_surface_temperature,
                 "risk_level": risk_level

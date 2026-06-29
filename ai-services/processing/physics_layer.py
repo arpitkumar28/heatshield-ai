@@ -80,17 +80,35 @@ class PhysicsLayer:
         return ndwi
     
     @staticmethod
-    def calculate_albedo(bands: Dict[str, np.ndarray]) -> np.ndarray:
+    def calculate_albedo(*args, **kwargs) -> np.ndarray:
         """
         Calculate surface albedo from multiple bands
         Using Landsat 8/9 reflectance bands
         
         Args:
             bands: Dictionary of band arrays (blue, green, red, nir, swir1, swir2)
+            or positional arrays: blue, green, red, nir
         
         Returns:
             Surface albedo (0 to 1)
         """
+        if len(args) == 1 and isinstance(args[0], dict):
+            bands = args[0]
+        elif len(args) == 4:
+            blue, green, red, nir = args
+            bands = {
+                'blue': blue,
+                'green': green,
+                'red': red,
+                'nir': nir,
+                'swir1': nir,
+                'swir2': nir,
+            }
+        elif 'bands' in kwargs:
+            bands = kwargs['bands']
+        else:
+            raise TypeError("calculate_albedo expects a bands dict or blue, green, red, nir arrays")
+
         # Weighted sum for broadband albedo (simplified)
         weights = {
             'blue': 0.1,

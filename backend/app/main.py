@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.core.database import engine, Base
 from app.core.logging import configure_logging, get_logger
 from app.api import auth, locations, recommendations, analytics, heatmap
 from app.middleware.security import SecurityHeadersMiddleware, setup_rate_limiting, limiter
@@ -11,13 +10,13 @@ from app.middleware.prometheus import setup_prometheus
 configure_logging()
 logger = get_logger(__name__)
 
-# Create database tables
-Base.metadata.create_all(bind=engine, checkfirst=True)
+# NOTE: Base.metadata.create_all(bind=engine) removed for production readiness.
+# Use Alembic for database migrations.
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="AI-Powered Urban Heat Intelligence Platform for Bharatiya Antariksh Hackathon 2026"
+    description="Enterprise AI-Powered Urban Heat Intelligence Platform"
 )
 
 # Security headers middleware
@@ -55,6 +54,11 @@ def root(request: Request):
         "docs": "/docs",
         "api_prefix": settings.API_V1_PREFIX
     }
+
+
+@app.options("/")
+def root_options():
+    return {}
 
 
 @app.get("/health")

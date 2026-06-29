@@ -3,8 +3,13 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Layers, Clock, MapPin } from 'lucide-react'
 import { analyticsAPI } from '@/lib/api'
-import GISMap from '@/components/maps/GISMap'
-import { MapErrorBoundary } from '@/components/maps/MapErrorBoundary'
+import dynamic from 'next/dynamic'
+
+// Dynamically import GISMap to avoid SSR issues
+const GISMap = dynamic(
+  () => import('@/components/maps/GISMap'),
+  { ssr: false }
+)
 
 interface HeatDataPoint {
   id: number
@@ -29,17 +34,21 @@ interface LegendItemProps {
   label: string
 }
 
+const fallbackHeatData: HeatDataPoint[] = [
+  { id: 1, lat: 26.9124, lng: 75.7873, lst: 42.5, ndvi: 0.28, heatIndex: 48.2, isHotspot: true, timestamp: '2026-06-27T08:30:00.000Z' },
+  { id: 2, lat: 26.9360, lng: 75.8050, lst: 39.1, ndvi: 0.42, heatIndex: 43.5, isHotspot: false, timestamp: '2026-06-27T08:30:00.000Z' },
+  { id: 3, lat: 26.8890, lng: 75.7420, lst: 44.8, ndvi: 0.19, heatIndex: 50.1, isHotspot: true, timestamp: '2026-06-27T08:30:00.000Z' },
+  { id: 4, lat: 26.9580, lng: 75.7220, lst: 36.6, ndvi: 0.55, heatIndex: 40.8, isHotspot: false, timestamp: '2026-06-27T08:30:00.000Z' },
+  { id: 5, lat: 26.8980, lng: 75.8420, lst: 41.4, ndvi: 0.33, heatIndex: 46.0, isHotspot: true, timestamp: '2026-06-27T08:30:00.000Z' },
+  { id: 6, lat: 26.9280, lng: 75.7620, lst: 34.2, ndvi: 0.62, heatIndex: 38.1, isHotspot: false, timestamp: '2026-06-27T08:30:00.000Z' },
+]
+
 export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }) {
   const [heatData, setHeatData] = useState<HeatDataPoint[]>([])
   const [selectedLayer, setSelectedLayer] = useState<'lst' | 'ndvi' | 'heatIndex'>('lst')
   const [loading, setLoading] = useState(true)
   const [selectedCity, setSelectedCity] = useState('Jaipur')
-  const [isMounted, setIsMounted] = useState(false)
   const [selectedTime, setSelectedTime] = useState('current')
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   const fetchHeatmapData = useCallback(async () => {
     try {
@@ -51,36 +60,23 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
         lat: hotspot.lat,
         lng: hotspot.lng,
         lst: hotspot.temperature,
-        ndvi: 0.3 + Math.random() * 0.4,
-        heatIndex: hotspot.temperature + 2 + Math.random() * 3,
+        ndvi: 0.3 + ((index % 5) * 0.08),
+        heatIndex: hotspot.temperature + 2 + (index % 4) * 0.6,
         isHotspot: hotspot.risk_level === 'High',
-        timestamp: new Date().toISOString()
+        timestamp: '2026-06-27T08:30:00.000Z'
       }))
 
       setHeatData(transformedData)
-    } catch (error) {
-      console.error('Error fetching heatmap data:', error)
-      const mockData: HeatDataPoint[] = Array.from({ length: 50 }, (_, i) => ({
-        id: i,
-        lat: 26.9 + Math.random() * 0.1,
-        lng: 75.7 + Math.random() * 0.1,
-        lst: 30 + Math.random() * 15,
-        ndvi: Math.random() * 0.8,
-        heatIndex: 35 + Math.random() * 20,
-        isHotspot: Math.random() > 0.7,
-        timestamp: new Date().toISOString()
-      }))
-      setHeatData(mockData)
+    } catch {
+      setHeatData(fallbackHeatData)
     } finally {
       setLoading(false)
     }
   }, [selectedCity])
 
   useEffect(() => {
-    if (isMounted) {
-      fetchHeatmapData()
-    }
-  }, [isMounted, fetchHeatmapData])
+    fetchHeatmapData()
+  }, [fetchHeatmapData])
 
   const getColor = (value: number, layer: string) => {
     if (layer === 'lst') {
@@ -206,18 +202,14 @@ export default function HeatMap({ fullScreen = false }: { fullScreen?: boolean }
       </div>
 
       <div className={`rounded-xl overflow-hidden border border-white/10 ${fullScreen ? 'h-[calc(100vh-200px)]' : 'h-[600px]'}`}>
-        {isMounted && (
-          <MapErrorBoundary>
-            <GISMap
-              center={getCityCenter(selectedCity)}
-              heatData={heatData}
-              selectedLayer={selectedLayer}
-              getColor={getColor}
-              getRadius={getRadius}
-              fullScreen={fullScreen}
-            />
-          </MapErrorBoundary>
-        )}
+        <GISMap
+          center={getCityCenter(selectedCity)}
+          heatData={heatData}
+          selectedLayer={selectedLayer}
+          getColor={getColor}
+          getRadius={getRadius}
+          fullScreen={fullScreen}
+        />
       </div>
 
       <div className="glass-card rounded-xl p-4 border border-white/10">

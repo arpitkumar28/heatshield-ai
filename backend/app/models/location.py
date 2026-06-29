@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Float, DateTime, JSON, ForeignKey, Boolean, Index
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+from geoalchemy2 import Geometry
 from app.core.database import Base
 
 
@@ -8,10 +9,13 @@ class Location(Base):
     __tablename__ = "locations"
     
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, index=True)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
-    location_type = Column(String)  # city, district, region
+    # PostGIS geometry column with GIST index for spatial performance
+    geom = Column(Geometry(geometry_type='POINT', srid=4326), index=True)
+    
+    location_type = Column(String, index=True)  # city, district, region
     population = Column(Integer)
     area_sqkm = Column(Float)
     extra_data = Column(JSON)
@@ -20,13 +24,17 @@ class Location(Base):
     
     heat_data = relationship("HeatData", back_populates="location")
 
+    __table_args__ = (
+        Index('idx_location_geom', 'geom', postgresql_using='gist'),
+    )
+
 
 class HeatData(Base):
     __tablename__ = "heat_data"
     
     id = Column(Integer, primary_key=True, index=True)
-    location_id = Column(Integer, ForeignKey("locations.id"), nullable=False)
-    timestamp = Column(DateTime(timezone=True), nullable=False)
+    location_id = Column(Integer, ForeignKey("locations.id"), nullable=False, index=True)
+    timestamp = Column(DateTime(timezone=True), nullable=False, index=True)
     
     # Temperature metrics
     land_surface_temperature = Column(Float)  # LST in Celsius
@@ -47,7 +55,7 @@ class HeatData(Base):
     # Heat impact metrics
     heat_impact_score = Column(Float)
     vulnerability_score = Column(Float)
-    is_hotspot = Column(Boolean, default=False)
+    is_hotspot = Column(Boolean, default=False, index=True)
     
     # AI predictions
     predicted_lst = Column(Float)
@@ -66,12 +74,19 @@ class CoolingCenter(Base):
     name = Column(String, nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
+    # PostGIS geometry column with GIST index
+    geom = Column(Geometry(geometry_type='POINT', srid=4326), index=True)
+    
     address = Column(String)
     capacity = Column(Integer)
     current_occupancy = Column(Integer)
     facilities = Column(JSON)  # AC, water, medical, etc.
     operating_hours = Column(String)
     contact_phone = Column(String)
-    is_active = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    __table_args__ = (
+        Index('idx_cooling_center_geom', 'geom', postgresql_using='gist'),
+    )

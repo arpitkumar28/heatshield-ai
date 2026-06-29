@@ -1,6 +1,6 @@
 'use client'
 
-import dynamic from 'next/dynamic'
+import GISMapClient from './GISMapClient'
 
 interface HeatDataPoint {
   id: number
@@ -22,19 +22,6 @@ interface GISMapProps {
   fullScreen?: boolean
   onLocationClick?: (point: HeatDataPoint) => void
 }
-
-// Dynamic import with SSR disabled to prevent hydration issues
-const GISMapClient = dynamic(
-  () => import('./GISMapClient'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center h-full bg-white/5 rounded-lg">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
-)
 
 export default function GISMap(props: GISMapProps) {
   return <GISMapClient {...props} />

@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+import inspect
 import time
 
 
@@ -12,7 +13,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Middleware to add security headers to all responses."""
     
     async def dispatch(self, request: Request, call_next):
-        response = await call_next(request)
+        response = call_next(request)
+        if inspect.isawaitable(response):
+            response = await response
         
         # Security headers
         response.headers["X-Content-Type-Options"] = "nosniff"

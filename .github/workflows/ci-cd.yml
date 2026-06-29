@@ -159,7 +159,10 @@ jobs:
       with:
         context: ./backend
         push: true
-        tags: heatshield-backend:latest,heatshield-backend:${{ github.sha }}
+        # Production-grade tagging: Use SHA and latest
+        tags: |
+          heatshield-backend:latest
+          heatshield-backend:${{ github.sha }}
         cache-from: type=registry,ref=heatshield-backend:latest
         cache-to: type=inline
     
@@ -168,7 +171,9 @@ jobs:
       with:
         context: ./frontend
         push: true
-        tags: heatshield-frontend:latest,heatshield-frontend:${{ github.sha }}
+        tags: |
+          heatshield-frontend:latest
+          heatshield-frontend:${{ github.sha }}
         cache-from: type=registry,ref=heatshield-frontend:latest
         cache-to: type=inline
     
@@ -177,7 +182,9 @@ jobs:
       with:
         context: ./ai-services
         push: true
-        tags: heatshield-ai-services:latest,heatshield-ai-services:${{ github.sha }}
+        tags: |
+          heatshield-ai-services:latest
+          heatshield-ai-services:${{ github.sha }}
         cache-from: type=registry,ref=heatshield-ai-services:latest
         cache-to: type=inline
 
@@ -201,6 +208,11 @@ jobs:
     
     - name: Deploy to Kubernetes
       run: |
+        # Update image tags in deployment to use specific SHA for immutable rollouts
+        sed -i "s|heatshield-backend:latest|heatshield-backend:${{ github.sha }}|g" deployment/kubernetes/backend-deployment.yaml
+        sed -i "s|heatshield-frontend:latest|heatshield-frontend:${{ github.sha }}|g" deployment/kubernetes/frontend-deployment.yaml
+        sed -i "s|heatshield-ai-services:latest|heatshield-ai-services:${{ github.sha }}|g" deployment/kubernetes/ai-services-deployment.yaml
+        
         kubectl apply -f deployment/kubernetes/
         kubectl rollout status deployment/heatshield-backend
         kubectl rollout status deployment/heatshield-frontend

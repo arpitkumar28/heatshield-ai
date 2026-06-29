@@ -50,7 +50,7 @@ export default function PremiumFooter() {
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-surface to-background" />
       
-      <div className="relative z-10 container mx-auto px-6 py-20">
+      <div className="relative z-10 w-full max-w-full mx-auto px-6 py-20">
         <div className="grid lg:grid-cols-5 gap-12 mb-16">
           {/* Brand column */}
           <motion.div
