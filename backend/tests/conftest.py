@@ -1,7 +1,13 @@
+import os
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+# Ensure required settings are present for test runs (CI / local)
+os.environ.setdefault("SECRET_KEY", "test-secret")
+os.environ.setdefault("DATABASE_URL", "sqlite:///./test.db")
+
 from app.main import app
 from app.core.database import Base, get_db
 from app.core.config import settings

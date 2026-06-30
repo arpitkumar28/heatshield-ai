@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 
 interface WebSocketMessage {
   type: string
-  data?: any
+  data?: unknown
   timestamp?: string
 }
 
@@ -33,7 +33,7 @@ export function useWebSocket(
   const [isConnected, setIsConnected] = useState(false)
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null)
   const wsRef = useRef<WebSocket | null>(null)
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>()
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const clientIdRef = useRef(`client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`)
 
   const connect = useCallback(() => {
@@ -62,9 +62,9 @@ export function useWebSocket(
       }
 
       wsRef.current.onmessage = (event) => {
-        const message: WebSocketMessage = JSON.parse(event.data)
-        setLastMessage(message)
-        onMessage?.(message)
+        const parsed = JSON.parse(event.data) as WebSocketMessage
+        setLastMessage(parsed)
+        onMessage?.(parsed)
       }
 
       wsRef.current.onerror = (error) => {
@@ -85,7 +85,7 @@ export function useWebSocket(
     } catch (error) {
       onError?.(error as Event)
     }
-  }, [url, onConnect, onDisconnect, onError, reconnectInterval, subscriptions])
+  }, [url, onConnect, onDisconnect, onError, reconnectInterval, subscriptions, onMessage])
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -100,7 +100,7 @@ export function useWebSocket(
     setIsConnected(false)
   }, [])
 
-  const sendMessage = useCallback((message: any) => {
+  const sendMessage = useCallback((message: unknown) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message))
     }
@@ -142,7 +142,7 @@ export function useWebSocket(
 }
 
 // Specific hooks for different WebSocket endpoints
-export function useHeatDataWebSocket(city: string = 'all', onHeatData?: (data: any) => void) {
+export function useHeatDataWebSocket(city: string = 'all', onHeatData?: (data: unknown) => void) {
   const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000'}/api/v1/realtime/ws/heat-data?city=${city}`
 
   return useWebSocket(wsUrl, {
@@ -154,7 +154,7 @@ export function useHeatDataWebSocket(city: string = 'all', onHeatData?: (data: a
   })
 }
 
-export function useAlertsWebSocket(onAlert?: (alert: any) => void) {
+export function useAlertsWebSocket(onAlert?: (alert: unknown) => void) {
   const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000'}/api/v1/realtime/ws/alerts`
 
   return useWebSocket(wsUrl, {
