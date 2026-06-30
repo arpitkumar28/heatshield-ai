@@ -1,14 +1,138 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
+import pandas as pd
+import numpy as np
 from app.core.database import get_db
 from app.core.security import get_current_user, get_current_admin
 from app.schemas.recommendation import Recommendation as RecommendationSchema, RecommendationCreate, HeatAlert, HeatAlertCreate
 from app.models.recommendation import Recommendation as RecommendationModel
 from app.services.recommendation_service import RecommendationService
 from app.models.user import User
+from ai_services.models.vulnerability_model import HeatRiskModel
 
 router = APIRouter()
+
+# Initialize AI model for recommendations
+heat_risk_model = HeatRiskModel()
+
+
+@router.post("/ai-generate")
+async def generate_ai_recommendations(
+    location_data: dict,
+    db: Session = Depends(get_db)
+):
+    """
+    Generate AI-powered recommendations based on location vulnerability and risk assessment
+    """
+    try:
+        # Create DataFrame from location data
+        data = pd.DataFrame([location_data])
+        
+        # Calculate comprehensive risk
+        risk_data = heat_risk_model.calculate_heat_risk(data)
+        risk_score = risk_data['risk_score'].iloc[0]
+        vulnerability_score = risk_data['vulnerability_score'].iloc[0]
+        
+        # Generate recommendations based on risk profile
+        recommendations = []
+        
+        # High vulnerability recommendations
+        if vulnerability_score > 0.7:
+            recommendations.append({
+                "title": "Emergency Cooling Centers",
+                "category": "Infrastructure",
+                "description": "Deploy immediate emergency cooling centers in high-risk areas",
+                "priority": "critical",
+                "impact_score": 0.95,
+                "cost_estimate": "₹2.5 Cr",
+                "timeline": "48 hours",
+                "confidence": 0.92
+            })
+            recommendations.append({
+                "title": "Heat Health Alert System",
+                "category": "Public Health",
+                "description": "Activate SMS-based heat health alerts for vulnerable populations",
+                "priority": "critical",
+                "impact_score": 0.88,
+                "cost_estimate": "₹1.2 Cr",
+                "timeline": "1 week",
+                "confidence": 0.91
+            })
+        
+        # High temperature recommendations
+        if risk_data['hazard_score'].iloc[0] > 0.6:
+            recommendations.append({
+                "title": "Green Roof Initiative",
+                "category": "Urban Planning",
+                "description": "Implement green roof program for commercial buildings",
+                "priority": "high",
+                "impact_score": 0.85,
+                "cost_estimate": "₹8 Cr",
+                "timeline": "6 months",
+                "confidence": 0.87
+            })
+            recommendations.append({
+                "title": "Urban Tree Plantation",
+                "category": "Vegetation",
+                "description": "Plant native trees along major roads and public spaces",
+                "priority": "high",
+                "impact_score": 0.78,
+                "cost_estimate": "₹80 L",
+                "timeline": "12 months",
+                "confidence": 0.85
+            })
+        
+        # Adaptive capacity recommendations
+        if vulnerability_score > 0.5:
+            recommendations.append({
+                "title": "Water Station Network",
+                "category": "Infrastructure",
+                "description": "Install public water stations with chilled water dispensers",
+                "priority": "medium",
+                "impact_score": 0.85,
+                "cost_estimate": "₹45 L",
+                "timeline": "4 months",
+                "confidence": 0.83
+            })
+            recommendations.append({
+                "title": "Reflective Surface Program",
+                "category": "Infrastructure",
+                "description": "Apply reflective coatings on rooftops and roads",
+                "priority": "medium",
+                "impact_score": 0.72,
+                "cost_estimate": "₹1.2 Cr",
+                "timeline": "8 months",
+                "confidence": 0.80
+            })
+        
+        # Default recommendations if no specific risks
+        if not recommendations:
+            recommendations = [
+                {
+                    "title": "Vegetation Enhancement",
+                    "category": "Urban Planning",
+                    "description": "Increase green cover through parks and gardens",
+                    "priority": "low",
+                    "impact_score": 0.65,
+                    "cost_estimate": "₹50 L",
+                    "timeline": "6 months",
+                    "confidence": 0.75
+                }
+            ]
+        
+        return {
+            "risk_assessment": {
+                "risk_score": float(risk_score),
+                "vulnerability_score": float(vulnerability_score),
+                "hazard_score": float(risk_data['hazard_score'].iloc[0]),
+                "risk_class": int(risk_data['risk_class'].iloc[0])
+            },
+            "recommendations": recommendations,
+            "total_recommendations": len(recommendations)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/")

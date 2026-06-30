@@ -33,8 +33,8 @@ services:
 
   backend:
     build:
-      context: ../backend
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: backend/Dockerfile
     container_name: heatshield-backend
     ports:
       - "8000:8000"
@@ -57,8 +57,8 @@ services:
 
   frontend:
     build:
-      context: ../frontend
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: deployment/docker/frontend.Dockerfile
     container_name: heatshield-frontend
     ports:
       - "3000:3000"
@@ -71,20 +71,20 @@ services:
       - /app/node_modules
       - /app/.next
 
-  ai-services:
-    build:
-      context: ../ai-services
-      dockerfile: Dockerfile
-    container_name: heatshield-ai-services
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/heatshield
-      REDIS_URL: redis://redis:6379/0
-    depends_on:
-      - postgres
-      - redis
-    volumes:
-      - ../ai-services:/app
-      - ../datasets:/datasets
+  # ai-services:
+  #   build:
+  #     context: ../..
+  #     dockerfile: deployment/docker/ai-services.Dockerfile
+  #   container_name: heatshield-ai-services
+  #   environment:
+  #     DATABASE_URL: postgresql://postgres:postgres@postgres:5432/heatshield
+  #     REDIS_URL: redis://redis:6379/0
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   volumes:
+  #     - ../ai-services:/app
+  #     - ../datasets:/datasets
 
 volumes:
   postgres_data:

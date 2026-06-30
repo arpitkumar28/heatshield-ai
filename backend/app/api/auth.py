@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from datetime import timedelta
+import time
 from app.core.database import get_db
 from app.core.security import create_access_token, get_current_user
 from app.core.config import settings
@@ -30,7 +31,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     return auth_service.create_user(user)
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login(request: Request, db: Session = Depends(get_db)):
     if request.headers.get("content-type", "").startswith("application/json"):
         credentials = await request.json()
@@ -60,6 +61,50 @@ async def login(request: Request, db: Session = Depends(get_db)):
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": str(user.id), "email": user.email, "role": user.role},
+        expires_delta=access_token_expires
+    )
+    
+    # Generate a refresh token (in production, this should be stored in database)
+    refresh_token = create_access_token(
+        data={"sub": str(user.id), "type": "refresh"},
+        expires_delta=timedelta(days=7)
+    )
+    
+    return {
+        "user": {
+            "id": str(user.id),
+            "email": user.email,
+            "name": user.full_name,
+            "role": user.role,
+            "permissions": ["read", "write"],  # This should come from user's permissions
+            "organization": "ISRO",  # This should come from user's organization
+            "createdAt": user.created_at.isoformat() if hasattr(user, 'created_at') else None,
+            "lastLogin": None,
+        },
+        "tokens": {
+            "accessToken": access_token,
+            "refreshToken": refresh_token,
+            "expiresIn": (access_token_expires.total_seconds() * 1000) + int(time.time() * 1000),
+        }
+    }
+
+
+@router.post("/refresh")
+async def refresh_token(request: Request, db: Session = Depends(get_db)):
+    credentials = await request.json()
+    refresh_token = credentials.get("refreshToken")
+    
+    if not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Refresh token is required"
+        )
+    
+    # In a real implementation, you would validate the refresh token
+    # For now, we'll issue a new access token
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": "user_id"},  # This would come from the refresh token
         expires_delta=access_token_expires
     )
     

@@ -130,3 +130,39 @@ def get_heat_trends(
             for t in trends
         ]
     }
+
+
+@router.get("/location-comparison")
+def compare_locations(location_ids: str = Query(...), db: Session = Depends(get_db)):
+    """Compare multiple locations by id (simple aggregate)."""
+    ids = [int(i) for i in location_ids.split(",") if i.strip().isdigit()]
+    results = []
+    for lid in ids:
+        latest = db.query(HeatData).filter(HeatData.location_id == lid).order_by(HeatData.timestamp.desc()).limit(1).first()
+        loc = db.query(Location).filter(Location.id == lid).first()
+        if latest and loc:
+            results.append({
+                "location_id": lid,
+                "name": loc.name,
+                "latest_lst": latest.land_surface_temperature,
+                "latest_heat_index": latest.heat_index,
+            })
+
+    return {"comparison": results}
+
+
+@router.get("/vulnerability-map")
+def get_vulnerability_map(db: Session = Depends(get_db)):
+    """Return vulnerability scores for monitored locations."""
+    results = []
+    locations = db.query(Location).all()
+    for loc in locations:
+        latest = db.query(HeatData).filter(HeatData.location_id == loc.id).order_by(HeatData.timestamp.desc()).limit(1).first()
+        if latest:
+            results.append({
+                "location_id": loc.id,
+                "name": loc.name,
+                "vulnerability_score": latest.vulnerability_score,
+            })
+
+    return {"vulnerability_data": results}

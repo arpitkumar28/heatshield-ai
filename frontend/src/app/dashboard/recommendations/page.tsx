@@ -1,11 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Sidebar from '@/components/dashboard/Sidebar'
-import TopNav from '@/components/dashboard/TopNav'
-import Card from '@/components/ui/Card'
-import Button from '@/components/ui/Button'
-import Badge from '@/components/ui/Badge'
+import { PremiumButton as Button, PremiumBadge as Badge } from '@/ui'
 import { Shield, Clock, Users, DollarSign, ArrowRight } from 'lucide-react'
 
 const recommendations = [
@@ -85,16 +81,11 @@ const columns = [
 
 export default function RecommendationsPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <Sidebar />
-      <TopNav />
-      
-      <main className="ml-64 pt-16 p-6">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
           {/* Page header */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold mb-2">Recommendations</h1>
@@ -171,7 +162,5 @@ export default function RecommendationsPage() {
             ))}
           </div>
         </motion.div>
-      </main>
-    </div>
   )
 }

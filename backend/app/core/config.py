@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import PostgresDsn, RedisDsn, field_validator
-from typing import List, Union, Any
+from typing import List, Union, Any, ClassVar
+from pathlib import Path
 
 
 class Settings(BaseSettings):
@@ -50,10 +51,14 @@ class Settings(BaseSettings):
     LANDSAT_API_URL: str = "https://earthexplorer.usgs.gov/api"
     SENTINEL_API_URL: str = "https://scihub.copernicus.eu/apihub"
     
+    # Resolve env files relative to the project backend root so tests and docker
+    # runs find the same `.env` files regardless of process cwd.
+    BASE_DIR: ClassVar[Path] = Path(__file__).resolve().parents[2]
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=[str(BASE_DIR / ".env"), str(BASE_DIR / ".env.local")],
+        env_file_encoding="utf-8",
         case_sensitive=True,
-        extra="ignore"
+        extra="ignore",
     )
 
 

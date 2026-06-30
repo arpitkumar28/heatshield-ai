@@ -6,7 +6,6 @@ import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
-import xgboost as xgb
 import joblib
 from typing import Dict, Tuple, Optional, List
 import os
@@ -46,15 +45,28 @@ class HeatPredictor:
                 n_jobs=-1
             )
         elif model_type == "xgboost":
-            self.model = xgb.XGBRegressor(
-                n_estimators=100,
-                max_depth=8,
-                learning_rate=0.1,
-                subsample=0.8,
-                colsample_bytree=0.8,
-                random_state=42,
-                n_jobs=-1
-            )
+            # Lazy import xgboost so missing OpenMP/runtime doesn't break app startup
+            try:
+                import xgboost as xgb  # type: ignore
+                self.model = xgb.XGBRegressor(
+                    n_estimators=100,
+                    max_depth=8,
+                    learning_rate=0.1,
+                    subsample=0.8,
+                    colsample_bytree=0.8,
+                    random_state=42,
+                    n_jobs=-1
+                )
+            except Exception:
+                # Fallback to RandomForest when xgboost is not available on the host
+                # (e.g., missing libomp). This keeps the service startable.
+                self.model = RandomForestRegressor(
+                    n_estimators=50,
+                    max_depth=10,
+                    random_state=42,
+                    n_jobs=-1
+                )
+                self.model_type = "random_forest"
         else:
             raise ValueError(f"Unknown model type: {model_type}")
     

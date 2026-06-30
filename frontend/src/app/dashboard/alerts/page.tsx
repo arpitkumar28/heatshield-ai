@@ -1,12 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Sidebar from '@/components/dashboard/Sidebar'
-import TopNav from '@/components/dashboard/TopNav'
-import Card from '@/components/ui/Card'
-import Button from '@/components/ui/Button'
-import Badge from '@/components/ui/Badge'
+import { EnterpriseCard, PremiumButton as Button, PremiumBadge as Badge } from '@/ui'
 import { Clock, MapPin, Filter, Bell, CheckCircle } from 'lucide-react'
+
+const Card = EnterpriseCard
 
 const alerts = [
   {
@@ -83,16 +81,11 @@ export default function AlertsPage() {
   const otherAlerts = alerts.filter(a => !['critical', 'high'].includes(a.type))
 
   return (
-    <div className="min-h-screen bg-background">
-      <Sidebar />
-      <TopNav />
-      
-      <main className="ml-64 pt-16 p-6">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
           {/* Page header */}
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -205,7 +198,5 @@ export default function AlertsPage() {
             </div>
           </div>
         </motion.div>
-      </main>
-    </div>
   )
 }

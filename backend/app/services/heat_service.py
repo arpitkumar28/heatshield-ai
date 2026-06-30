@@ -5,6 +5,7 @@ from app.schemas.location import HeatDataCreate, CoolingCenterCreate
 from typing import Optional, List, Dict, Any
 from geoalchemy2.functions import ST_DWithin, ST_SetSRID, ST_Point
 from geoalchemy2 import Geography, WKTElement
+import math
 from app.tasks.ai_jobs import process_ai_prediction
 
 class HeatService:
@@ -72,9 +73,25 @@ class HeatService:
         return center
     
     def get_nearby_cooling_centers(self, latitude: float, longitude: float, radius_km: float = 5.0) -> List[CoolingCenter]:
+        # If running against SQLite (tests/local dev), avoid PostGIS-only functions
+        # and fall back to a simple bounding-box filter.
+        engine = getattr(self.db.bind, 'dialect', None)
+        if engine is not None and engine.name == 'sqlite':
+            # Approximate degrees per km: latitude ~111 km per degree
+            lat_delta = radius_km / 111.0
+            # Longitude degrees depend on latitude
+            lon_delta = radius_km / (111.320 * max(0.0001, math.cos(math.radians(latitude))))
+            min_lat, max_lat = latitude - lat_delta, latitude + lat_delta
+            min_lon, max_lon = longitude - lon_delta, longitude + lon_delta
+            return self.db.query(CoolingCenter)\
+                .filter(CoolingCenter.is_active == True)\
+                .filter(CoolingCenter.latitude.between(min_lat, max_lat))\
+                .filter(CoolingCenter.longitude.between(min_lon, max_lon))\
+                .all()
+
         point = ST_SetSRID(ST_Point(longitude, latitude), 4326)
         radius_meters = radius_km * 1000
-        
+
         return self.db.query(CoolingCenter)\
             .filter(CoolingCenter.is_active == True)\
             .filter(func.ST_DWithin(

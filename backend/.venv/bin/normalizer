@@ -1,4 +1,4 @@
-#!/Users/arpit/Downloads/work/projects/ISRO/heatshield-ai/backend/.venv/bin/python3.11
+#!/Users/arpit/Downloads/work/projects/ISRO/heatshield/backend/.venv/bin/python3.11
 import sys
 from charset_normalizer.cli import cli_detect
 if __name__ == '__main__':

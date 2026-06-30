@@ -1,10 +1,10 @@
 'use client'
 
-import { EnterpriseCard } from '@/components/ui/premium'
-import ExecutiveMetrics from '@/components/dashboard/premium/ExecutiveMetrics'
-import AIInsights from '@/components/dashboard/premium/AIInsights'
-import AnalyticsCharts from '@/components/dashboard/premium/AnalyticsCharts'
-import HeatMap from '@/components/dashboard/premium/HeatMap'
+import { EnterpriseCard } from '@/ui'
+import ExecutiveMetrics from '@/features/dashboard/ExecutiveMetrics'
+import AIInsights from '@/features/dashboard/AIInsights'
+import AnalyticsCharts from '@/features/dashboard/AnalyticsCharts'
+import HeatMap from '@/features/dashboard/HeatMap'
 import { Activity, MapPin, Satellite } from 'lucide-react'
 
 export default function Dashboard() {

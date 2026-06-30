@@ -6,7 +6,7 @@ import { analyticsAPI } from '@/lib/api'
 
 // Dynamically import GISWorkspace to avoid SSR issues
 const GISWorkspace = dynamic(
-  () => import('@/components/gis/GISWorkspace'),
+  () => import('@/features/gis').then(mod => mod.GISWorkspace),
   { ssr: false }
 )
 

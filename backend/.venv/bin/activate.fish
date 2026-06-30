@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV /Users/arpit/Downloads/work/projects/ISRO/heatshield-ai/backend/.venv
+set -gx VIRTUAL_ENV /Users/arpit/Downloads/work/projects/ISRO/heatshield/backend/.venv
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"bin $PATH
